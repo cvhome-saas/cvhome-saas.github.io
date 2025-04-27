@@ -33,4 +33,28 @@ questions on an issue if you need clarification before starting work.
 1. **Fork the Repository:** Fork the specific repository you want to contribute to (e.g., `cvhome`, `cvhome-repo`,
    `cvhome-ecs-fargate-infra`) to your own GitHub account.
 2. **Clone Your Fork:** Clone your forked repository to your local machine.
+3. **Create a Branch:** Create a new branch for your changes. Choose a descriptive name (e.g., `fix/login-bug`,
+   `feat/add-product-sorting`).
+4. **Make Changes:** Implement your bug fix or feature.
+5. **Commit Changes:** Commit your changes with a clear and descriptive commit message.
+6. **Running The Test Cases:** Before pushing your changes and submitting a Pull Request, run the following command:
+   ### On Linux/macOS
+    ```bash
+   ./gradlew test
+   ```
+   ### On Windows
+    ```bash
+   gradlew.bat test
+   ``` 
+7. **Apply Code Style:** Before pushing your changes and submitting a Pull Request, run the following command:
+   ### On Linux/macOS
+    ```bash
+   ./gradlew spotlessApply
+   ```
+   ### On Windows
+    ```bash
+   gradlew.bat spotlessApply
+   ``` 
+8. **Submit a Pull Request:** Go to the original repository on GitHub and open a Pull Request from your branch to the
+   appropriate target branch develop. Provide a clear description of your changes in the PR.
     
