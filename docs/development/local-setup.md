@@ -27,11 +27,11 @@ This guide provides instructions for setting up `cvhome` to run on your local ma
 
 3. **Access:**
 
-* [store-ui](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
-* [Org1 Store1](http://org1-store1.store-pod-saas-gateway-1.gateway.com)
-* [Org1 Store2](http://org1-store2.store-pod-saas-gateway-1.gateway.com)
-* [Org2 Store1](http://org2-store1.store-pod-saas-gateway-1.gateway.com)
-* [Org2 Store2](http://org2-store2.store-pod-saas-gateway-1.gateway.com)
+   * [http://store-uihttp://store-ui.gateway.com:8000](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
+   * [http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100)
+   * [http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100)
+   * [http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100)
+   * [http://org2-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store2.store-pod-saas-gateway-1.gateway.com:8100)
 
 ## Full Development Setup
 
@@ -73,11 +73,11 @@ This guide provides instructions for setting up `cvhome` to run on your local ma
    ~2-3 minutes for services to start.
 
 7. **Access:**
-    * [store-ui](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
-    * [Org1 Store1](http://org1-store1.store-pod-saas-gateway-1.gateway.com)
-    * [Org1 Store2](http://org1-store2.store-pod-saas-gateway-1.gateway.com)
-    * [Org2 Store1](http://org2-store1.store-pod-saas-gateway-1.gateway.com)
-    * [Org2 Store2](http://org2-store2.store-pod-saas-gateway-1.gateway.com)
+    * [http://store-uihttp://store-ui.gateway.com:8000](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
+    * [http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100)
+    * [http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100)
+    * [http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100)
+    * [http://org2-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store2.store-pod-saas-gateway-1.gateway.com:8100)
 8. **Development:**
     Now you can start development using your IDE (IntelliJ, VS Code, Eclipse) 
    * make sure to use dev profile like `spring.profiles.active=dev`
