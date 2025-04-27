@@ -114,7 +114,6 @@ using the images pushed in Step 2. **This is the longest step.**
   * Look for a step named **"Run terraform output"**.
   * Expand this step's logs. It will display key URLs. **These URLs are the primary way to access your
   application.**
-  *   !
 * **Secondary Check - AWS Console (Optional / Troubleshooting):**
   * Log in to your AWS Console in the specified region.
   *   **Check ECS Services:** Navigate to **Elastic Container Service (ECS)**. You should see at least two clusters![](/images/all-ecs-clusters.png)
