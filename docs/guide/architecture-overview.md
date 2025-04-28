@@ -10,7 +10,7 @@ For the foundational principles behind this design, please refer to the [**Core 
 As outlined in the Core Concepts, `cvhome` is fundamentally divided into two logical cluster types:
 
 1. **The Core Cluster:** A single, central cluster managing shared functionalities like authentication, tenant (
-   Organization) provisioning, and system administration.
+   Organization) provisioning, Subscription management, and system administration.
    ```mermaid
         graph TD
         subgraph Core
@@ -146,9 +146,7 @@ The `cvhome` platform utilizes multiple repositories for code and infrastructure
 
 1. **Application Code (`cvhome`):** Contains the application source code (microservices, UIs).
 2. **Infrastructure Pre-configuration (`cvhome-repo`):** Manages Production configuration (Terraform).
-3. **AWS Infrastructure Deployment (`cvhome-ecs-fargate-infra`):** Deploys the main AWS infrastructure (Terraform).
-
-![](/images/all-repo.png)
+3. **AWS Infrastructure Deployment (`cvhome-ecs-fargate-infra`):** Deploys the main AWS infrastructure (Terraform).![](/images/all-repo.png)
 *Note: The infrastructure repositories (`cvhome-repo`, `cvhome-ecs-fargate-infra`) are separate, not needed for local
 development, but are essential for the AWS deployment sections.*
 ---
