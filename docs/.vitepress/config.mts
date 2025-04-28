@@ -36,6 +36,7 @@ export default withMermaid({
         items: [
           // { text: 'Deployment Overview', link: '/deployment/overview' }, // Removed - Assumed file deleted/empty
           { text: 'AWS Deployment Guide', link: '/deployment/aws-deployment-guide' }, // Renamed and corrected link
+          { text: 'AWS Architecture', link: '/deployment/aws-architecture' },
           { text: 'Cleanup Guide', link: '/deployment/cleanup-guide' }, // Corrected text
           // { text: 'Monitoring & Logging', link: '/deployment/monitoring' }, // Optional
           // { text: 'Upgrading', link: '/deployment/upgrading' } // Optional
