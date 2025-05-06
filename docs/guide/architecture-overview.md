@@ -23,7 +23,6 @@ As outlined in the Core Concepts, `cvhome` is fundamentally divided into two log
         
                 subgraph CoreResources[Core Resources]
                     CoreDB[(PostgresSQL)]
-                    CoreRabbit[(RabbitMQ)]
                 end
             end
         
@@ -38,6 +37,7 @@ As outlined in the Core Concepts, `cvhome` is fundamentally divided into two log
 
 2. **Store Pod Clusters:** One or more independent clusters, each capable of hosting multiple e-commerce storefronts and
    their associated backend microservices. Each Store Pod operates with its own database.
+
 ```mermaid
 graph TD
     subgraph Pod-N
@@ -52,7 +52,6 @@ graph TD
 
         subgraph PodResources[Pod Resources]
             PodDB[(PostgresSQL)]
-            PodRabbit[(RabbitMQ)]
         end
     end
 
@@ -96,9 +95,11 @@ Each Store Pod is a microcosm of an e-commerce platform, containing the services
   listings, product details, handles user interactions like adding to cart and checkout.
 * **`gateway`:** The API Gateway provide main entry point for accessing the Cluster services .
   identifies the target Store based on the request's domain (resolving it to a `storeId`).
-* **`caddy`:** The edge reverse proxy and TLS termination point for the Store Pod. It automatically generates and renews
-  TLS certificates (e.g., via Let's Encrypt) for custom domains configured for stores (via the `manager` service in the
-  Core Cluster) and forwards traffic internally, typically to the `gateway`.
+* **`caddy`:**  The reverse proxy and entry point for every store
+    * It automatically generates and renews TLS certificates for custom domains configured for stores and forwards
+      traffic internally, typically to the `gateway`.
+    * identifies the target Store based on the request's domain (resolving it to a `storeId`) before forward the traffic
+      to the `gateway`.
 
 ## Communication Flow (Typical Storefront Request)
 
@@ -106,9 +107,9 @@ Each Store Pod is a microcosm of an e-commerce platform, containing the services
 2. DNS resolves to the IP address of the Load Balancer fronting the Store Pod hosting this store.
 3. The request hits **`caddy`**, which terminates TLS (having previously obtained a certificate based on configuration
    from the `manager`).
-4. `caddy` forwards the request to the Store Pod **`gateway`**.
-5. The `gateway` inspects the `Host: store1.customdomain.com` header, determines the corresponding `storeId`, and routes
-   the request to the **`landing-ui` (Next.js)** service, adding the `storeId` context.
+4. `caddy` inspects the `Host: store1.customdomain.com` header, determines the corresponding `storeId` forwards the
+   request to the Store Pod **`gateway`**.
+5. The `gateway` routes the request to the **`landing-ui` (Next.js)** service and other Store Pod services.
 6. The Next.js application renders the page, making further API calls back through the **`gateway`** (which adds
    `storeId` context) to services like `catalog` or `content` to fetch necessary data. These backend services interact
    with the **Store Pod Database**, scoping queries by `storeId`.
@@ -146,7 +147,9 @@ The `cvhome` platform utilizes multiple repositories for code and infrastructure
 
 1. **Application Code (`cvhome`):** Contains the application source code (microservices, UIs).
 2. **Infrastructure Pre-configuration (`cvhome-repo`):** Manages Production configuration (Terraform).
-3. **AWS Infrastructure Deployment (`cvhome-ecs-fargate-infra`):** Deploys the main AWS infrastructure (Terraform).![](/images/all-repo.png)
-*Note: The infrastructure repositories (`cvhome-repo`, `cvhome-ecs-fargate-infra`) are separate, not needed for local
-development, but are essential for the AWS deployment sections.*
+3. **AWS Infrastructure Deployment (`cvhome-ecs-fargate-infra`):** Deploys the main AWS infrastructure (
+   Terraform).![](/images/all-repo.png)
+   *Note: The infrastructure repositories (`cvhome-repo`, `cvhome-ecs-fargate-infra`) are separate, not needed for local
+   development, but are essential for the AWS deployment sections.*
+
 ---
