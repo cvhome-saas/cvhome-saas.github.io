@@ -27,7 +27,7 @@ This guide provides instructions for setting up `cvhome` to run on your local ma
 
 3. **Access:**
 
-   * [http://store-uihttp://store-ui.gateway.com:8000](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
+   * [http://store-ui.gateway.com:8000](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
    * [http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100)
    * [http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100)
    * [http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100)
@@ -73,7 +73,7 @@ This guide provides instructions for setting up `cvhome` to run on your local ma
    ~2-3 minutes for services to start.
 
 7. **Access:**
-    * [http://store-uihttp://store-ui.gateway.com:8000](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
+    * [http://store-ui.gateway.com:8000](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
     * [http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100)
     * [http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100)
     * [http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100)
