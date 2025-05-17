@@ -45,7 +45,7 @@ configuration parameters in AWS Parameter Store.
     * Find the workflow typically named **"Trigger Apply"**.
     * Click on the workflow name.
     * Click the **"Run workflow"** dropdown button.
-    * Ensure the correct branch `develop` branch is selected.
+    * Ensure the correct branch `main` branch is selected.
         * Click the green **"Run workflow"** button.![](/images/trigger-cvhome-repo.png)
 2. **Monitor:** Wait for the workflow to complete successfully. Check the logs for any errors.
 3. **Verification (AWS Console):**

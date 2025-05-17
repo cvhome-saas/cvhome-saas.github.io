@@ -56,5 +56,5 @@ questions on an issue if you need clarification before starting work.
    gradlew.bat spotlessApply
    ``` 
 8. **Submit a Pull Request:** Go to the original repository on GitHub and open a Pull Request from your branch to the
-   appropriate target branch **develop**. Provide a clear description of your changes in the PR.
+   appropriate target branch **main**. Provide a clear description of your changes in the PR.
     
