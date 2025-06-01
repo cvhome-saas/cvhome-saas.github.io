@@ -51,7 +51,7 @@ configuration parameters in AWS Parameter Store.
 3. **Verification (AWS Console):**
    * Log in to your AWS Console in the specified region (`AWS_REGION`).
    * **Check ECR:** Navigate to **Elastic Container Registry (ECR)**. Verify that repositories for the microservices (
-     e.g., `store-core/auth`, `store-core/manager`, etc.) have been created. ![](/images/ecr-repo.png)
+     e.g., `store-core/core-auth`, `store-core/manager`, etc.) have been created. ![](/images/ecr-repo.png)
    * **Check Parameter Store:** Navigate to **Systems Manager > Parameter Store**. Verify that parameters exist, especially
      the `config/cvhome`,`config/domain` parameter, and ensure it has the correct value
      you configured.![](/images/parameter-store.png)

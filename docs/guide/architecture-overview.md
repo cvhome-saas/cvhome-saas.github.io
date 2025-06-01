@@ -15,7 +15,7 @@ As outlined in the Core Concepts, `cvhome` is fundamentally divided into two log
         graph TD
         subgraph Core
         CoreGateway[Core Gateway]
-        Auth[Auth Service]
+        CoreAuth[CoreAuth Service]
         Manager[Manager Service]
         Subscription[Subscription Service]
         StoreUI[Store-ui Service]
@@ -27,7 +27,7 @@ As outlined in the Core Concepts, `cvhome` is fundamentally divided into two log
             end
         
         %% Core cluster connections
-        CoreGateway --> Auth
+        CoreGateway --> CoreAuth
         CoreGateway --> Manager
         CoreGateway --> Subscription
         CoreGateway --> StoreUI
@@ -70,7 +70,7 @@ graph TD
 
 The Core Cluster houses the central administrative and management services:
 
-* **`auth` (Keycloak-based):** Handles admins authentication and authorization.
+* **`core-auth` (Keycloak-based):** Handles admins authentication and authorization.
 * **`manager`:** The core orchestration service. Responsible for:
     * Managing users and permissions within an Organization.
     * Allocating Stores to specific Store Pod Clusters (`store-pod-n`).
