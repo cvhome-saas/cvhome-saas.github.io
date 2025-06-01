@@ -146,10 +146,10 @@ The `cvhome` platform leverages a modern technology stack:
 The `cvhome` platform utilizes multiple repositories for code and infrastructure:
 
 1. **Application Code (`cvhome`):** Contains the application source code (microservices, UIs).
-2. **Infrastructure Pre-configuration (`cvhome-repo`):** Manages Production configuration (Terraform).
+2. **Infrastructure Pre-configuration (`cvhome-bootstrap`):** Manages Production configuration (Terraform).
 3. **AWS Infrastructure Deployment (`cvhome-ecs-fargate-infra`):** Deploys the main AWS infrastructure (
    Terraform).![](/images/all-repo.png)
-   *Note: The infrastructure repositories (`cvhome-repo`, `cvhome-ecs-fargate-infra`) are separate, not needed for local
+   *Note: The infrastructure repositories (`cvhome-bootstrap`, `cvhome-ecs-fargate-infra`) are separate, not needed for local
    development, but are essential for the AWS deployment sections.*
 
 ---

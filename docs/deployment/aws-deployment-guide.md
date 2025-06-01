@@ -17,7 +17,7 @@ application deployment.
 4. **GitHub Organization:** A GitHub organization is strongly recommended.
 5. **Forked Repositories:** Fork all three `cvhome` repositories **into your GitHub organization**:
     * `cvhome` (Application Code)
-    * `cvhome-repo` (Infrastructure Prerequisites & Configuration)
+    * `cvhome-bootstrap` (Infrastructure Prerequisites & Configuration)
     * `cvhome-ecs-fargate-infra` (Main Infrastructure Deployment)
     * *Ensure you fork them directly into the organization.*
     * ![](/images/all-repo.png)
@@ -34,19 +34,19 @@ application deployment.
 
 Follow these steps sequentially. **Do not proceed to the next step until the current one completes successfully.**
 
-### Step 1: Run Infrastructure Prerequisites (`cvhome-repo`)
+### Step 1: Run Infrastructure Prerequisites (`cvhome-bootstrap`)
 
 This step uses Terraform via GitHub Actions to create foundational resources (ECR, IAM policies) and sets up crucial
 configuration parameters in AWS Parameter Store.
 
 1. **Trigger Workflow:**
-    * Navigate to your forked `cvhome-repo` repository in GitHub.
+    * Navigate to your forked `cvhome-bootstrap` repository in GitHub.
     * Go to the **Actions** tab.
     * Find the workflow typically named **"Trigger Apply"**.
     * Click on the workflow name.
     * Click the **"Run workflow"** dropdown button.
     * Ensure the correct branch `main` branch is selected.
-        * Click the green **"Run workflow"** button.![](/images/trigger-cvhome-repo.png)
+        * Click the green **"Run workflow"** button.![](/images/trigger-cvhome-bootstrap.png)
 2. **Monitor:** Wait for the workflow to complete successfully. Check the logs for any errors.
 3. **Verification (AWS Console):**
    * Log in to your AWS Console in the specified region (`AWS_REGION`).

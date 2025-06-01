@@ -22,7 +22,7 @@ This guide outlines the general process for contributing.
 Check the GitHub Issues across the `cvhome` repositories:
 
 * `cvhome` (Application Code)
-* `cvhome-repo` (Infrastructure Prerequisites)
+* `cvhome-bootstrap` (Infrastructure Prerequisites)
 * `cvhome-ecs-fargate-infra` (Main Infrastructure)
 
 Look for issues tagged with `good first issue` or `help wanted` if you're looking for a place to start. Feel free to ask
@@ -30,7 +30,7 @@ questions on an issue if you need clarification before starting work.
 
 ## Development Workflow (Code Contributions)
 
-1. **Fork the Repository:** Fork the specific repository you want to contribute to (e.g., `cvhome`, `cvhome-repo`,
+1. **Fork the Repository:** Fork the specific repository you want to contribute to (e.g., `cvhome`, `cvhome-bootstrap`,
    `cvhome-ecs-fargate-infra`) to your own GitHub account.
 2. **Clone Your Fork:** Clone your forked repository to your local machine.
 3. **Create a Branch:** Create a new branch for your changes. Choose a descriptive name (e.g., `fix/login-bug`,
