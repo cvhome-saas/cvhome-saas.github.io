@@ -10,7 +10,7 @@ Understanding these fundamental concepts is key to working effectively with `cvh
 
 The administrative hub of the deployment, handling shared, cross-cutting concerns.
 
-*   **Key Functions:** Manages authentication (e.g., via Keycloak), tenant creation/configuration, subscription management, and provides central admin APIs/UI.
+*   **Key Functions:** Manages authentication, tenant creation/configuration, subscription management, and provides central admin APIs/UI.
 *   **Database:** Has its **own dedicated database instance**.
 
 ### Store Pod Clusters (`store-pod-1` to `store-pod-n`)
@@ -40,23 +40,6 @@ Self-contained, deployable units running the actual e-commerce storefronts and r
 *   **Consideration:** Relies on logical data separation; potential for resource contention ("noisy neighbor").
 
 The choice allows tailoring deployments based on tenant needs and cost.
-
-## 3. Resource Isolation (Database & Services)
-
-Strong isolation, particularly at the database level, is a core principle.
-
-### Database Isolation
-
-*   **Key Point:** The Core Cluster and **each individual Store Pod Cluster** have their **own, completely separate database instances** (e.g., PostgreSQL).
-*   **Benefit:** Provides a strong physical boundary for data, enhancing security, performance, and fault tolerance. Issues in one pod's database don't directly affect others.
-
-### Service Isolation
-
-*   **Dedicated Pods:** Offer high service isolation, as service instances (compute, memory) within the pod serve only one tenant.
-*   **Shared Pods:** Service instances are shared. Isolation is primarily **logical**, enforced by application code ensuring tenant data privacy within shared services.
-
-This focus on isolation improves security, stability, and scalability.
-
 ---
 
 *This document outlines the core architectural ideas. Specific service implementations and the technology stack are detailed in the Architecture Overview.*

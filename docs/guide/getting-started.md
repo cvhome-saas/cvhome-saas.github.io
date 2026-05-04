@@ -11,7 +11,7 @@ If your goal is to set up and run your own instance of cvhome:
 1.  **Quick Local Demo (Recommended First Step):** To quickly run `cvhome` on your local machine for evaluation using Docker, follow the **Quick Start with Docker Compose** guide. This is the fastest way to see it in action.
 2.  **Understand the Basics:** Before a real deployment, it's highly recommended to grasp the **Core Concepts**, especially the **Dual Cluster Architecture** and **Multi-Tenancy Models**.
 3.  **Cloud Deployment Options:** Review the **Deployment Overview** to understand the general strategies for cloud deployment.
-4.  **Deploy on AWS:** Follow the detailed **AWS ECS Deployment Guide** which utilizes Terraform and GitHub Actions for a production-like setup.
+4.  **Deploy on AWS:** Follow the detailed **AWS Deployment Guide** which utilizes AWS CloudFormation and CodeBuild pipelines for a production-like setup.
 5.  **Configuration:** Learn about essential **Environment Variables** required for configuration.
 6.  **Customization:** Explore how to customize the appearance using the **Theming Guide**.
 
