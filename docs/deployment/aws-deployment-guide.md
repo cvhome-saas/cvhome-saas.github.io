@@ -1,135 +1,76 @@
-# AWS Deployment Guide (Using GitHub Actions)
+# AWS Deployment Guide
 
-This guide details the steps required to deploy the `cvhome` platform to AWS using the pre-configured GitHub Actions
-workflows within the project repositories. This process automates much of the infrastructure provisioning and
-application deployment.
+This guide details the steps required to deploy the `cvhome` platform to AWS. The process has been simplified using a CloudFormation "Launch Stack" button which sets up the necessary CodeBuild pipelines for building, deploying, and destroying the infrastructure.
 
 ## Prerequisites
 
-1. **AWS Account**
-2. **Domain Registered in Route 53**
-    * ![](/images/domain.png)
-3. **ACM Certificate:**
-    * You need a **validated AWS Certificate Manager (ACM) SSL/TLS certificate** for your domain (and potentially its
-      subdomains, e.g., using a wildcard like `*.example.com` and the apex `example.com`).
-    * This certificate **must be in the same AWS region** where you plan to deploy `cvhome`.
-    * ![](/images/certificate.png)
-4. **GitHub Organization:** A GitHub organization is strongly recommended.
-5. **Forked Repositories:** Fork all three `cvhome` repositories **into your GitHub organization**:
-    * `cvhome` (Application Code)
-    * `cvhome-bootstrap` (Infrastructure Prerequisites & Configuration)
-    * `cvhome-ecs-fargate-infra` (Main Infrastructure Deployment)
-    * *Ensure you fork them directly into the organization.*
-    * ![](/images/all-repo.png)
-6. **GitHub Actions Secrets Configured:** Configure the following secrets at the **Organization level** (*Settings* >
-   *Secrets and variables* > *Actions* > *Repository secrets* tab > *New organization secret* button). Make them
-   available to **all three forked repositories**:
-    * `AWS_ACCESS_KEY_ID`: Your AWS access key ID.
-    * `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key.
-    * `AWS_REGION`: The AWS region where you want to deploy.
-    * ![](/images/env.png)
-7. **Stripe Account (Optional):** If you intend to use the subscription/billing features
+Before starting the deployment, ensure you have the following:
+
+1. **AWS Account:** Access to an AWS account with sufficient permissions.
+2. **Domain Registered in Route 53:** A hosted zone for your domain must exist in Route 53.
+3. **GitHub Account:** Your GitHub account where the `cvhome` repositories will be accessed.
+4. **Stripe Account (Optional):** If you intend to use subscription/billing features, have your Stripe API key ready.
 
 ## Deployment Steps
 
-Follow these steps sequentially. **Do not proceed to the next step until the current one completes successfully.**
+Follow these steps to deploy the application:
 
-### Step 1: Run Infrastructure Prerequisites (`cvhome-bootstrap`)
+### Step 1: Launch the Bootstrap Stack
 
-This step uses Terraform via GitHub Actions to create foundational resources (ECR, IAM policies) and sets up crucial
-configuration parameters in AWS Parameter Store.
+The deployment starts with the `cvhome-bootstrap` repository.
 
-1. **Trigger Workflow:**
-    * Navigate to your forked `cvhome-bootstrap` repository in GitHub.
-    * Go to the **Actions** tab.
-    * Find the workflow typically named **"Trigger Apply"**.
-    * Click on the workflow name.
-    * Click the **"Run workflow"** dropdown button.
-    * Ensure the correct branch `main` branch is selected.
-        * Click the green **"Run workflow"** button.![](/images/trigger-cvhome-bootstrap.png)
-2. **Monitor:** Wait for the workflow to complete successfully. Check the logs for any errors.
-3. **Verification (AWS Console):**
-   * Log in to your AWS Console in the specified region (`AWS_REGION`).
-   * **Check ECR:** Navigate to **Elastic Container Registry (ECR)**. Verify that repositories for the microservices (
-     e.g., `store-core/core-auth`, `store-core/manager`, etc.) have been created. ![](/images/ecr-repo.png)
-   * **Check Parameter Store:** Navigate to **Systems Manager > Parameter Store**. Verify that parameters exist, especially
-     the `config/cvhome`,`config/domain` parameter, and ensure it has the correct value
-     you configured.![](/images/parameter-store.png)
-4. **Configure Parameters:** Before running the workflow, you might need to customize deployment
-   parameters (like your domain name, Stripe keys, pod settings) **`Please Check Configuration section for more detail`**.
-    * **Configure Domain (Required)** ![](/images/config-domain.png)
-    * **Configure Stripe (Optional)** ![](/images/config-stripe.png)
+1.  **Launch Stack:** Go to the `cvhome-bootstrap` repository's README and click on the **"Launch Stack"** button. This will take you to the AWS CloudFormation console.
 
-### Step 2: Build and Push Application Images (`cvhome`)
+    ![](/images/launch-stack-button.png)
 
-This step builds the Docker images for all microservices and pushes them to the ECR repositories created in Step 1.
+2.  **Fill Parameters:** Provide the following information in the CloudFormation "Create stack" wizard:
+    *   **DomainZoneId:** Select the Route53 hosted zone for your application.
+    *   **PodCount:** Number of pods to create (0-20, default: 0).
+    *   **PodSize:** Size of the pod (`small`, `medium`, `large`, or `x-large`).
+    *   **PodAutoScale:** Enable or disable pod auto scaling (`true`/`false`).
+    *   **isProd:** Set to `true` for Production or `false` for Dev environment.
+    *   **isMonitoring:** Enable or disable monitoring (`true`/`false`).
+    *   **allowTestStores:** Allow test stores (`true`/`false`).
+    *   **GithubAccount:** Your GitHub account name for deployments.
+    *   **Branch:** The branch to deploy (default: `main`).
+    *   **StripeKey (Optional):** Your Stripe API key.
 
-1. **Identify Image Tag:**
-    * In your forked `cvhome` repository, navigate to the root directory.
-    * Open the `gradle.properties` file.
-    * Find the `version` property (e.g., `version=0.2.12`).
-    * **Note down this exact version string.** This will be the Docker image tag used for
-      deployment. ![](/images/version.png)
-2. **Trigger Workflow:**
-    * Navigate to your forked `cvhome` repository in GitHub.
-    * Go to the **Actions** tab.
-    * Find the workflow typically named **"Trigger Publishing To Private ECR"** or similar.
-    * Click on the workflow name.
-    * Click the **"Run workflow"** dropdown button.
-    * Ensure the correct branch usually `main` is selected.
-    * Click the green **"Run workflow"** button. ![](/images/trigger-cvhome.png)
-3. **Monitor:** Wait for the workflow to complete successfully. Check the logs for any errors, especially during the
-   image push steps.
-4. **Verification (AWS Console):**
-* Log in to your AWS Console in the specified region.
-* **Check ECR Images:** Navigate to **ECR**. Click on one of the repositories created in Step 1 (e.g.,
-  `store-core/store-core-gateway`). Verify that an image with the **exact tag** you noted from `gradle.properties` (
-  e.g.,
-  `0.2.12`) now exists in the repository. Check a few different repositories. ![](/images/core-gateway-image-tag.png)
+    ![](/images/cloudformation-parameters.png)
 
-### Step 3: Deploy Main Infrastructure (`cvhome-ecs-fargate-infra`)
+3.  **Create Stack:** Complete the wizard and wait for the CloudFormation stack to be created. This stack sets up three CodeBuild pipelines.
 
-This step deploys the core AWS infrastructure (VPC, ECS, RDS, Load Balancers, etc.) and runs the application containers
-using the images pushed in Step 2. **This is the longest step.**
+    ![](/images/codebuild.png)
 
-1. **Trigger Workflow:**
-    * Navigate to your forked `cvhome-ecs-fargate-infra` repository in GitHub.
-    * Go to the **Actions** tab.
-    * Find the workflow typically named **"Trigger Apply"**.
-    * Click on the workflow name.
-    * Click the **"Run workflow"** dropdown button.
-    * Ensure the correct branch `main` is selected.
-    * **Provide Image Tag:** You will likely see an input field labeled `docker image tag`. **Enter
-      the exact image tag/version** you noted from `gradle.properties` in Step 2.
-    * Click the green **"Run workflow"** button. ![](/images/trigger-cvhome-ecs-infra.png)
-2. **Monitor and Verify:**
-    * Wait for the workflow to complete successfully. This step provisions significant infrastructure and can easily
-      take **15-30 minutes or longer**.
-    * Monitor the logs closely, especially the `terraform apply` steps, for any errors.
-3. **Verification (Workflow Output & AWS Console):**
-* **Primary Check - Workflow Output:**
-  * Go to the completed workflow run for **"Trigger Apply"** in the `cvhome-ecs-fargate-infra` repository's
-  Actions tab.
-  * Click on the completed job (often named `apply` or `deploy`).
-  * Look for a step named **"Run terraform output"**.
-  * Expand this step's logs. It will display key URLs. **These URLs are the primary way to access your
-  application.**
-* **Secondary Check - AWS Console (Optional / Troubleshooting):**
-  * Log in to your AWS Console in the specified region.
-  *   **Check ECS Services:** Navigate to **Elastic Container Service (ECS)**. You should see at least two clusters![](/images/all-ecs-clusters.png)
-  *   **Verify Each Cluster:** For each cluster, Select your cluster you should see all services are in `ACTIVE` state. 
-  * **Core**![](/images/core-cluster.png)
-  * **Pod**![](/images/pod-cluster.png)
-  *   **Check RDS:** Navigate to **RDS > Databases**. Verify your database instance exists and its status is
-      `Available`.![](/images/databases.png)
+### Step 2: Build and Push Images (`cvhome-build`)
 
-## Accessing the Deployed Application
+Once the bootstrap stack is ready, you need to build the application images.
 
-Once Step 3 completes successfully, the application should be deployed.
+1.  **Navigate to CodeBuild:** Go to the AWS CodeBuild console.
+2.  **Start Build:** Find the project named `cvhome-build` and click **"Start build"**.
 
-1. **Find Output URLs:**
-    * Go to the completed workflow run for **"Trigger Apply"** in the `cvhome-ecs-fargate-infra` repository's Actions
-      tab.
-    * Click on the completed job (often named `apply` or `deploy`).
-    * Look for a step named **"Run terraform output"**.
-    * Expand this step's logs. It will display key URLs:![](/images/infra-output.png)
+    ![](/images/codebuild.png)
+
+3.  **Monitor:** This pipeline builds the Docker images and pushes them to the Amazon Elastic Container Registry (ECR). Wait for it to complete successfully.
+
+    ![](/images/ecr-repo.png)
+
+### Step 3: Deploy Infrastructure (`cvhome-deploy`)
+
+After the images are pushed, you can deploy the main infrastructure.
+
+1.  **Start Deploy:** In the AWS CodeBuild console, find the project named `cvhome-deploy`.
+2.  **Trigger Apply:** Click **"Start build"**. This pipeline triggers a `terraform apply` to provision the VPC, ECS clusters, RDS, and other resources.
+
+    ![](/images/codebuild.png)
+
+3.  **Wait for Completion:** This is the longest step and may take 15-30 minutes.
+
+    ![](/images/all-ecs-clusters.png)
+
+## Accessing the Application
+
+After `cvhome-deploy` finishes successfully:
+1.  Check the logs of the `cvhome-deploy` build.
+2.  Look for the **Terraform Outputs** section to find the URLs for your deployed application.
+
+![](/images/infra-output.png)

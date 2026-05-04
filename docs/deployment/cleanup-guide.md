@@ -3,22 +3,20 @@
 Use these steps to remove AWS resources created by the `cvhome` deployment pipelines.
 
 **🔴 WARNING: IRREVERSIBLE ACTION 🔴**
-*   Running these "Destroy" workflows **permanently deletes** infrastructure (databases, servers, etc.).
+*   Running the "Destroy" pipeline **permanently deletes** infrastructure (databases, servers, etc.).
 *   **All application data will be lost.**
 *   Proceed only if you are sure you want to remove the entire deployment.
 
 
-## Cleanup Steps (Order is Critical!)
+## Cleanup Steps
 
-1.  **Destroy Main Infrastructure (`cvhome-ecs-fargate-infra`):**
-    *   Go to your forked `cvhome-ecs-fargate-infra` repo > **Actions**.
-    *   Find and run the **"Trigger Destroy"** workflow (usually on the `main` branch).
-    *   Wait for it to complete successfully.
+1.  **Navigate to CodeBuild:** Go to the AWS CodeBuild console.
+2.  **Start Destroy Build:** Find the project named `cvhome-destory` and click **"Start build"**.
 
-![](/images/distroy-cvhome-ecs-infra.png)
+3.  **Wait for Completion:** This pipeline triggers a `terraform destroy` which will remove all provisioned resources. Wait for the build to complete successfully.
 
 ## Verification (Optional)
 
-*   After the workflow succeed, check the AWS Console (VPC, ECS, RDS, etc) in the deployment region to confirm resources are gone.
+*   After the build succeeds, check the AWS Console (VPC, ECS, RDS, etc.) in your deployment region to confirm resources are gone.
 
 ---

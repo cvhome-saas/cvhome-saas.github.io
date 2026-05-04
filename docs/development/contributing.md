@@ -46,15 +46,6 @@ questions on an issue if you need clarification before starting work.
     ```bash
    gradlew.bat test
    ``` 
-7. **Apply Code Style:** Before pushing your changes and submitting a Pull Request, run the following command:
-   ### On Linux/macOS
-    ```bash
-   ./gradlew spotlessApply
-   ```
-   ### On Windows
-    ```bash
-   gradlew.bat spotlessApply
-   ``` 
-8. **Submit a Pull Request:** Go to the original repository on GitHub and open a Pull Request from your branch to the
+7. **Submit a Pull Request:** Go to the original repository on GitHub and open a Pull Request from your branch to the
    appropriate target branch **main**. Provide a clear description of your changes in the PR.
     

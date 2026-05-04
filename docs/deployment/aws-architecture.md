@@ -1,6 +1,6 @@
 # AWS Deployment Architecture
 
-This document provides a simplified overview of the AWS architecture used for deploying the `cvhome` multi-tenant platform using `cvhome-ecs-fargate-infra`.
+This document provides a simplified overview of the AWS architecture used for deploying the `cvhome` multi-tenant platform.
 
 ## Overview
 
@@ -14,10 +14,11 @@ The architecture uses managed AWS services to create a scalable, highly availabl
     *   Runs the application containers (API Gateway, backend services, frontends) without needing to manage servers.
     *   Orchestrates the deployment and scaling of these containers.
 
-*   **Networking (Amazon VPC, Application Load Balancer, AWS Route 53):**
+*   **Networking (Amazon VPC, Application Load Balancer, AWS Route 53, AWS CloudMap):**
     *   Provides an isolated network environment (VPC).
     *   Distributes incoming web traffic to the correct containers, handles SSL/TLS (ALB).
     *   Manages DNS records, routing traffic for the main platform domain and tenant-specific domains/subdomains to the ALB (Route 53).
+    *   Internal service to service communication using CloudMap
 
 *   **Data Storage (Amazon RDS + Amazon S3):**
     *   Provides a managed PostgresSQL database for application data (tenants, products, orders, etc.) (RDS).

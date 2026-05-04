@@ -1,45 +1,18 @@
 # Local Development Setup
 
-This guide provides instructions for setting up `cvhome` to run on your local machine. There are two primary methods:
+This guide provides instructions for setting up `cvhome` to run on your local machine:
 
-1. **Quick Start with Docker Compose:** The fastest way to run locally, ideal for demos.
-2. **Full Development Setup:** Setting up the required tools (Java, Gradle, Node.js),
+1. **Full Development Setup:** Setting up the required tools (Java, Gradle, Node.js),
    building and running all services manually. good for core development and debugging.
 ---
-
-## Quick Start with Docker Compose
-
-### Prerequisites
-
-* Docker & Docker Compose
-* curl
-
-### Steps
-
-1. **Setup & Download:**
-   Execute this command in your terminal:
-   ```bash 
-     curl -sSL https://raw.githubusercontent.com/cvhome-saas/assets/refs/heads/main/fast-run/fast-run.sh | sudo bash
-   ```
-
-2. **Wait:**
-   ~5-10 minutes to download and run docker images.
-
-3. **Access:**
-
-   * [http://store-ui.gateway.com:8000](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
-   * [http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100)
-   * [http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100)
-   * [http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100)
-   * [http://org2-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store2.store-pod-saas-gateway-1.gateway.com:8100)
 
 ## Full Development Setup
 
 ### Prerequisites
 
 * **Git**
-* **JDK 23**
-* **Gradle 8**
+* **JDK 25**
+* **Gradle 9**
 * **Node.js 20.x**
 * **Docker & Docker Compose**
 
@@ -57,8 +30,7 @@ This guide provides instructions for setting up `cvhome` to run on your local ma
     ```bash 
     ./gradlew clean build -x test
     ```
-4. **Launch required Resources:** this will run required resources before run the main project like (
-   rabbitmq,postgres,keycloak,caddy,minio,mailcatcher)
+4. **Launch required Resources:** this will run required resources before run the main project
     ```bash 
     docker compose -f docker-compose-lcl.yml up -d
     ```
@@ -73,11 +45,11 @@ This guide provides instructions for setting up `cvhome` to run on your local ma
    ~2-3 minutes for services to start.
 
 7. **Access:**
-    * [http://store-ui.gateway.com:8000](http://store-ui.gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
-    * [http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store1.store-pod-saas-gateway-1.gateway.com:8100)
-    * [http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org1-store2.store-pod-saas-gateway-1.gateway.com:8100)
-    * [http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store1.store-pod-saas-gateway-1.gateway.com:8100)
-    * [http://org2-store2.store-pod-saas-gateway-1.gateway.com:8100](http://org2-store2.store-pod-saas-gateway-1.gateway.com:8100)
+    * [http://gateway.com:8000](http://gateway.com:8000) (`org1-admin@mail.com/admin`) or (`org2-admin@mail.com/admin`)
+    * [http://org1-store1.spg-507f1f77.gateway.com](http://org1-store1.spg-507f1f77.gateway.com)
+    * [http://org1-store2.spg-507f1f77.gateway.com](http://org1-store2.spg-507f1f77.gateway.com)
+    * [http://org2-store1.spg-507f1f77.gateway.com](http://org2-store1.spg-507f1f77.gateway.com)
+    * [http://org2-store2.spg-507f1f77.gateway.com](http://org2-store2.spg-507f1f77.gateway.com)
 8. **Development:**
     Now you can start development using your IDE (IntelliJ, VS Code, Eclipse) 
    * make sure to use dev profile like `spring.profiles.active=dev`
