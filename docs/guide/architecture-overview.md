@@ -32,30 +32,29 @@ As outlined in the Core Concepts, `cvhome` is fundamentally divided into two log
 
 2. **Store Pod Clusters:** One or more independent clusters, each capable of hosting multiple e-commerce storefronts and
    their associated backend microservices. Each Store Pod operates with its own database.
-
-```mermaid
-graph TD
-    subgraph Pod-N
-        Spg[Spg]
-        Merchant[Merchant Service]
-        Catalog[Catalog Service]
-        Order[Order Service]
-        CUA[CUA Service]
-        LandingUI[Landing-ui Service]
-
-        subgraph PodResources[Pod Resources]
-            PodDB[(PostgresSQL)]
-        end
-    end
-
-%% Pod-N cluster connections
-    Spg --> Merchant
-    Spg --> Catalog
-    Spg --> Order
-    Spg --> CUA
-    Spg --> LandingUI
-    Pod-N --> PodResources
-```
+    ```mermaid
+        graph TD
+            subgraph Pod-N
+                Spg[Spg]
+                Merchant[Merchant Service]
+                Catalog[Catalog Service]
+                Order[Order Service]
+                CUA[CUA Service]
+                LandingUI[Landing-ui Service]
+        
+                subgraph PodResources[Pod Resources]
+                    PodDB[(PostgresSQL)]
+                end
+            end
+        
+        %% Pod-N cluster connections
+            Spg --> Merchant
+            Spg --> Catalog
+            Spg --> Order
+            Spg --> CUA
+            Spg --> LandingUI
+            Pod-N --> PodResources
+    ```
 
 ## Inside the Core Cluster
 
