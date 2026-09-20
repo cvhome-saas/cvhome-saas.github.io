@@ -41,6 +41,7 @@ flowchart LR
   spg -.->|"ask-for-tls, lookup-by-domain"| merchant
   landing -->|"server-side reads via spg"| spg
   cua -->|"which store owns the shopper"| merchant
+  checkout -->|"cart lines"| catalog
   checkout -->|"reserve, commit"| inventory
   checkout -->|"initiate payment"| payment
   payment -.->|"payment signal (outbox)"| checkout
@@ -67,7 +68,7 @@ flowchart LR
   classDef edge fill:none,stroke:#10b981,stroke-width:2px
 ```
 
-Not drawn: every pod service accepts JWTs from both `uaa` (staff, via the gateway's token relay) and `cua` (shoppers), and authenticates to its peers with a `client_credentials` client against `uaa`; `catalog` asks `billing` in `store-core` for a store's entitlements before a product write. See [Containers](/architecture/containers) and [Authentication](/architecture/authentication).
+Not drawn, to keep the picture readable: six of these services (`catalog`, `checkout`, `content`, `cua`, `inventory`, `payment`) also call `merchant` for the store's configuration, which makes it the hub of the pod. Nor is the cross-layer call: `catalog` asks `billing` in `store-core` for a store's entitlements before a product write. Every service accepts JWTs from both `uaa` (staff, via the gateway's token relay) and `cua` (shoppers), and authenticates to its peers with a `client_credentials` client against `uaa`. The complete call graph, with the contract behind each edge, is on [Containers](/architecture/containers#service-to-service); the token side is on [Authentication](/architecture/authentication).
 
 ![A demo store's home page on its own host, rendered by landing-ui through spg](/images/lcl/storefront-home.png)
 
