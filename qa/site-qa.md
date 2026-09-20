@@ -65,7 +65,9 @@ which is copied to the site root untouched. The logo sat in `docs/images/logo/`,
 
 Fixed by moving it to `docs/public/logo.png` and referencing `/logo.png`. `scripts/check-images.sh` now has a
 second rule for paths named outside markdown and fails when one is not under `docs/public`; reverting the move
-makes it fail, which is how the rule was checked.
+makes it fail, which is how the rule was checked. **Closed 2026-09-20 on the deployed site**: `/logo.png`
+answers 200, and the home page names no other image path. The point of this entry is that the local checks
+were green while production was broken, so it is not closed until production says so.
 
 ## 99 — known gaps
 - None recorded yet.
