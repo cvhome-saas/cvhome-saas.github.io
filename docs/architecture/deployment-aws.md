@@ -82,6 +82,11 @@ Facts behind the boxes:
   otel-collector is a seventh, infrastructure-only service that exists when the flavour says `monitoring: true`.
 - **Core RDS.** One Postgres instance; every service owns a schema named after itself. Below prod with
   `rds.shared`, the default pod's services use this same instance.
+
+The private namespaces are ordinary Route 53 hosted zones, created by Cloud Map rather than by Terraform, so
+an environment's zone list holds the public zone plus one private zone per cluster:
+
+![The hosted zones of one environment: the public zone, and one Cloud Map private zone per cluster](/images/aws/route53-zones.png)
 - **Shared pieces.** Three Secrets Manager secrets (`/<project>/<env>/stripe`, `/uaa`, `/sso`) bound to tasks by
   ARN; SSM `/<project>/<env>/config` (what the bootstrap generated) and `/prereq` (what the prereq state
   published); a NAT gateway in prod or one `t4g.nano` NAT instance below prod; an S3 gateway endpoint so image

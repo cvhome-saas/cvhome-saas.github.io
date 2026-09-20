@@ -28,7 +28,7 @@ and no status codes: its listeners are TCP passthrough, and request-level number
 The dashboard names load balancers and services by ARN suffix, which do not exist while hibernated, so it is
 destroyed with the hourly things and recreated under the same name on wake.
 
-<!-- img: /images/aws/cloudwatch-dashboard.png — the project-env dashboard with the store-core, pod and network sections -->
+![The project-env dashboard with the store-core, pod and network sections](/images/aws/cloudwatch-dashboard.png)
 
 ## The collector
 

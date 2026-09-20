@@ -7,7 +7,7 @@ both colour themes, the search index, and the CI that builds and deploys it.
   "Source of truth" footer of each page).
 - **Runs on** — `npm ci && npm run docs:dev` (http://localhost:5173) for the dev-server cases; the GitHub
   Pages deployment for the last case.
-- **Cases** — 8 (7 verified, 1 not verified)
+- **Cases** — 9 (8 verified, 1 not verified)
 - **Also see** — none; this repo has one area.
 
 ## 00 — Before you start
@@ -53,6 +53,19 @@ visible; mermaid reports syntax errors there, not in the build.
 - Expect: each returns the owning page in the top results.
 - Result (2026-09-20): "pod-registry" returns the store-core section first, "lcl start" returns local
   development first, "hibernate" returns the lifecycle page first.
+
+## 04b — The AWS pages
+### 04b.1 The operations pages match a live environment [verified]
+- Setup: an environment deployed by the pipeline, and a signed-in console.
+- Steps: read `/operations/deployment-guide`, `/operations/pipeline`, `/operations/lifecycle`,
+  `/operations/monitoring` and `/architecture/deployment-aws` beside the console, and check every named
+  resource, parameter, output and stage.
+- Expect: each claim is true of the account, or the page is corrected.
+- Result (2026-09-20): matched on the seven build projects, the three secrets, the fifteen registry
+  repositories, six core and nine pod services, the single shared database below prod, the alias records, the
+  certificate and its wildcard, and the dashboard's widgets. Two claims were wrong and were fixed: the stack
+  shows ten outputs because `StripeWebhookPath` needs a Stripe key, and the apply stage skips the webhook
+  registration without one.
 
 ## 05 — CI
 ### 05.1 A pull request builds the site without deploying [verified]

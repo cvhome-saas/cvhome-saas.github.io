@@ -66,11 +66,7 @@ The form has four groups: Environment, Store pods, Integrations and Source. Ever
 | `Branch` | Branch | `main` | | Branch of both repositories the pipeline builds and applies from. The image build ignores it when `ImageTag` names a release. |
 | `ImageTag` | Product version | `latest` | `latest` or `X.Y.Z` (optional pre-release suffix) | The product version to deploy. Written to SSM as `image_tag`; `envs/<env>.tfvars` overrides it once a promotion PR has landed. |
 
-![CloudFormation: the stack parameters form](/images/aws/legacy-cloudformation-parameters.png)
-
-*Captured on the 1.x bootstrap, which asked for Pod Size, Pod Auto Scale, isProd, isMonitoring and
-allowTestStores. The current form has these parameters: ProjectId, EnvName, Flavour, DomainZoneId, PodCount,
-StripeKey, GithubAccount, PlatformRepo, AppRepo, Branch, ImageTag. The four legacy booleans became `Flavour`.*
+![The stack's Parameters tab: the eleven parameters and the values this environment was created with. CloudFormation masks StripeKey because the template declares it NoEcho.](/images/aws/cfn-stack-parameters.png)
 
 Acknowledge that the template creates IAM resources and create the stack.
 
@@ -90,42 +86,35 @@ Acknowledge that the template creates IAM resources and create the stack.
 
 When the stack reaches `CREATE_COMPLETE` its Outputs tab lists `ProjectId`, `Environment`, `Flavour`,
 `StateBucket`, `Registry` (the ECR path the images are pushed to), `NativeImageProject`, `ConfigParameterName`,
-`HibernateProject`, `WakeProject`, `PipelineConsole` and `StripeWebhookPath`.
+`HibernateProject`, `WakeProject` and `PipelineConsole`. An eleventh, `StripeWebhookPath`, is conditional: it
+appears only when you supplied a `StripeKey`, so an environment deployed without one shows ten.
 
-<!-- img: /images/aws/cfn-stack-outputs.png — the Outputs tab of the bootstrap stack after CREATE_COMPLETE -->
+![The Outputs tab of the bootstrap stack after CREATE_COMPLETE](/images/aws/cfn-stack-outputs.png)
 
 ## 5. Watch the pipeline
 
 The stack starts `1-prereq` by itself; each stage starts the next only on success, so a failure stops the
 line. Open CodeBuild, or follow the `PipelineConsole` output link.
 
-![CodeBuild: the build projects the bootstrap creates](/images/aws/legacy-codebuild.png)
-
-*Captured on the 1.x bootstrap, which had three projects (`build`, `infra-deploy`, `infra-destroy`). The
-current stack creates seven: `1-prereq`, `2-images`, `2-images-native`, `3-apply`, `destroy`, `hibernate` and
-`wake`, all named `<project>-<env>-...`.*
-
-<!-- img: /images/aws/codebuild-projects.png — the seven CodeBuild projects of one environment -->
+![The seven CodeBuild projects of one environment](/images/aws/codebuild-projects.png)
 
 | Stage | Compute | What it does | Typical duration |
 |---|---|---|---|
 | `1-prereq` | SMALL | `terraform apply` of `prereq/`: one ECR repository per catalog image, the regional and the us-east-1 ACM certificates with DNS validation, and the `/<project>/<env>/prereq` SSM record. Prints `repository_count`. | minutes |
 | `2-images` | LARGE, privileged | Clones cvhome at `v<ImageTag>` (or `Branch` when the tag is `latest`), Corretto 25, `./gradlew bootBuildImage --publishImage -Pversion=<tag> -x test -x check`, 15 images pushed to ECR. | about 15 minutes measured (826 s), less with a warm cache |
-| `3-apply` | SMALL | `terraform apply` of the environment root with `envs/<env>.tfvars`, then registers the Stripe webhook at `https://<env-domain>/billing/api/v1/stripe-webhook/public/events` and prints `console_url`. | minutes, plus ECS task startup |
+| `3-apply` | SMALL | `terraform apply` of the environment root with `envs/<env>.tfvars`, then registers the Stripe webhook at `https://<env-domain>/billing/api/v1/stripe-webhook/public/events` and prints `console_url`. Without a `StripeKey` the registration step logs "No Stripe key configured" and is skipped. | minutes, plus ECS task startup |
 
-![ECR: one repository per service image](/images/aws/legacy-ecr-repo.png)
+![One ECR repository per catalog image, created by the prerequisite stage and named after the layer and the service.](/images/aws/ecr-repositories.png)
 
 *Captured on the 1.x stack: it shows `control-plane` and `seller-ui`, which are now `tenancy` and
 `console-ui`, and lacks `billing`, `pod-registry`, `content` and `inventory`. Today `1-prereq` creates 15
 repositories under `<project>/store-core/...` and `<project>/store-pod/...`.*
 
-![CodeBuild: the apply stage prints the console URL](/images/aws/legacy-infra-output.png)
-
 *Captured on the 1.x stack, whose outputs were `pod_store_urls`, `store_ui_url` and `uaa_url`. `3-apply` now
 ends with `terraform output console_url`, and the full output set is `console_url`, `urls`, `pods`,
 `core_namespace`, `dashboard_url`, `flavour`, `service_count` and `hibernated`.*
 
-<!-- img: /images/aws/codebuild-3-apply-log.png — the tail of a 3-apply build log with the console_url line -->
+![The tail of a 3-apply build log with the console_url line](/images/aws/codebuild-3-apply-log.png)
 
 ## 6. First sign-in
 
@@ -138,7 +127,7 @@ printed by the pipeline, and this guide will not show one.
 aws secretsmanager get-secret-value --secret-id /<project>/<env>/uaa --query SecretString --output text
 ```
 
-<!-- img: /images/aws/secrets-list.png — the three secrets of one environment in Secrets Manager -->
+![The three secrets of one environment in Secrets Manager](/images/aws/secrets-list.png)
 
 uaa writes its client secrets into its database at boot while `uaa_seed_on_boot` is true (the default), which
 a fresh environment needs once. Switch it off in a long-lived environment after the first apply so an
@@ -157,21 +146,19 @@ operator's password change survives a restart.
 | CloudFront | one distribution per pod, aliased to `cdn-<id>.<env-domain>` |
 | CloudWatch, Dashboards | `<project>-<env>` (every flavour except `ephemeral`) |
 
-![ECS: the core cluster and one cluster per pod](/images/aws/legacy-all-ecs-clusters.png)
-
 *Captured on the 1.x stack (5 core and 7 pod services, Container Insights on). The current core cluster runs 6
 services plus the collector where `monitoring` is on; a pod runs 9; Container Insights follows the flavour's
 `monitoring` flag.*
 
-<!-- img: /images/aws/ecs-clusters.png — the ECS clusters list of one environment -->
-<!-- img: /images/aws/ecs-core-services.png — the services of the store-core cluster -->
-<!-- img: /images/aws/ecs-pod-services.png — the nine services of one pod cluster -->
-<!-- img: /images/aws/rds-instances.png — the RDS instances of one environment -->
-<!-- img: /images/aws/route53-records.png — the alias records one environment adds to the hosted zone -->
-<!-- img: /images/aws/ssm-parameters.png — the config, prereq and hibernated parameters -->
-<!-- img: /images/aws/acm-certificate.png — the issued certificate for the env domain and its wildcard -->
-<!-- img: /images/aws/cloudfront-distribution.png — one pod's CloudFront distribution and its alias -->
-<!-- img: /images/aws/cloudwatch-dashboard.png — the project-env CloudWatch dashboard -->
+![The ECS clusters list of one environment](/images/aws/ecs-clusters.png)
+![The services of the store-core cluster](/images/aws/ecs-core-services.png)
+![The nine services of one pod cluster](/images/aws/ecs-pod-services.png)
+![The RDS instances of one environment](/images/aws/rds-instances.png)
+![The alias records one environment adds to the hosted zone](/images/aws/route53-records.png)
+![The config, prereq and hibernated parameters](/images/aws/ssm-parameters.png)
+![The issued certificate for the env domain and its wildcard](/images/aws/acm-certificate.png)
+![One pod's CloudFront distribution and its alias](/images/aws/cloudfront-distribution.png)
+![The project-env CloudWatch dashboard](/images/aws/cloudwatch-dashboard.png)
 
 ## After the first run
 

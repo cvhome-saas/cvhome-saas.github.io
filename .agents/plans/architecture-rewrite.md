@@ -97,8 +97,8 @@ The only phase that needs an AWS account. It is done in one sitting on the exist
 after a person has signed in to the console in the browser; nothing here is a fresh bootstrap. Region
 `eu-central-1`, except the CloudFront certificate, which lives in `us-east-1`.
 
-**a. Capture the thirteen screenshots.** The slots are already in the pages as
-`<!-- img: /images/aws/<name>.png — … -->`; each one is replaced in place.
+**a. Capture the thirteen screenshots.** Done. The slots were in the pages as
+`<!-- img: /images/aws/<name>.png — … -->`; each was replaced in place.
 
 | File | Page and step |
 |---|---|
@@ -148,11 +148,29 @@ links and repo table (after this merges). assets: retire `fast-run` (independent
   the cart and checkout captures came out smaller than the rest. The slots were removed rather than left as
   comments or filled with something misleading. The identity server's sign-in page was captured instead and
   sits on the platform-admin page.
-- **Phase 12 is deliberately not in this pull request.** Everything that needs an AWS account was pulled out
-  of the phase list and grouped into one final phase, to be done in one sitting once a person has signed in
-  to the console. The thirteen slots stay in the pages as comments, the six legacy images stay with captions
-  saying which parts are stale, and the AWS pages stand on what the Terraform and the bootstrap template say
-  until the console confirms them.
+- **Phase 12 landed in this pull request after all.** It was planned as a separate one because it was blocked
+  on an account; the account arrived before the merge, so it became commits on this branch instead. One plan,
+  one pull request, as the convention says.
+- **The dev environment had been destroyed**, not left idle: the `destroy` project ran six days before this
+  phase and succeeded, so there were no clusters, no databases and no dashboard. It was rebuilt by starting
+  `1-prereq` and letting the event rules chain through `2-images` and `3-apply`. That rebuild is itself
+  evidence for the pipeline page: prerequisites in 49 seconds, images in about 19 minutes, apply after that.
+- **The environment is in `eu-north-1`.** The implementation plan named `eu-central-1` for the first
+  environment, and only the template's S3 URL is actually in that region. The pages were already written
+  region-neutrally, so nothing needed changing.
+- **Identifiers are replaced, not blacked out.** Each page's text is rewritten before the capture, so the
+  account number reads as zeroes, the account alias and domain are neutral, and resource names carry a
+  placeholder project id. Public repository paths are protected from the same pass, after a first attempt
+  rewrote the application repository's name too. A generic project id is also better documentation: a
+  reader's own deployment will not share this one.
+- **Two captures beyond the thirteen**, because they illustrate claims no planned slot covered: the registry
+  with one repository per catalog image, and the zone list showing the public zone beside the two Cloud Map
+  private namespaces.
+- **Five of the six legacy images are gone**, replaced by live captures of the same screens. The Launch Stack
+  button is the only one kept, since this phase updated an existing stack rather than creating one, and its
+  caption already says which part is still true.
+- **Images run about 400 KB rather than the 300 KB target**, because the capture arrives as JPEG and
+  converting that to PNG compresses poorly. The whole `docs/images` tree is 8.5 MB, inside the phase budget.
 - **12 themes, not 13.** The storefront theme registry lists twelve; the brief said thirteen.
 - **The pod list comes from pod-registry, not tenancy.** The gateway's `PodClient` calls
   `ReactiveExternalPodService.listPods()`; the reference that said tenancy was corrected in cvhome in the
@@ -162,6 +180,12 @@ links and repo table (after this merges). assets: retire `fast-run` (independent
 
 - `scripts/verify.sh` green at every phase: whitespace, `npm ci`, `npm run docs:build`, `scripts/check-images.sh`.
 - The build renders 30 pages with no dead link. 16 images, all referenced, none orphaned.
+- The AWS phase corrected two claims that only a live account could settle: the stack's Outputs tab shows ten
+  entries, not eleven, because `StripeWebhookPath` is conditional on a Stripe key; and the apply stage skips
+  the webhook registration, with a line in its log, when no key was given. Everything else the five AWS pages
+  claim matched what the console showed: seven build projects, three secrets, fifteen registry repositories,
+  six core services and nine pod services, one shared database below prod, alias records to the load balancers
+  and the distribution, a certificate covering the domain and its wildcard, and the dashboard's widget set.
 - `qa/site-qa.md`: seven of eight cases run and `[verified]` against the dev server in a browser on
   2026-09-20. The eighth needs the pull request merged. The pass found one defect, REG-1: mermaid re-wrapped
   any label line longer than its 200px default after sizing the box, so ports were clipped off the bottom of
