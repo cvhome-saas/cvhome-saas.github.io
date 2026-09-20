@@ -1,42 +1,53 @@
-# Introduction: Why cvhome?
+---
+title: Introduction
+---
 
-Welcome to cvhome, the open-source, multi-tenant e-commerce platform designed for scalability, control, and flexibility. It provides a robust foundation for organizations needing multiple storefronts or entrepreneurs building an e-commerce SaaS.
+# Introduction
 
-Built with a modern architecture (Java/Spring Boot, Next.js, Angular, PostgreSQL, Terraform, AWS), `cvhome` offers true multi-tenancy and the freedom of self-hosting.
+cvhome is an open-source, multi-tenant e-commerce platform that you run in your own AWS account. One deployment hosts many stores for many merchants, each on its own domain, with the isolation, billing and administration a hosted product needs. It evolved from the single-instance Shopizer code base into a multi-tenant SaaS and is licensed under Apache 2.0.
 
-## Who is cvhome for?
+## Who it is for
 
-`cvhome` is ideal if you need to:
+**An operator running stores for merchants.** You offer e-commerce stores as a service. Merchants sign up, create stores, choose a plan, connect payments and point their domains at you. Shared pods keep entry plans cheap; a dedicated pod gives a premium customer its own isolated infrastructure. Billing through Stripe, plan quotas and the platform administration screens come with the platform.
 
-### 1. Manage Multiple Private Stores
+**A company running its own stores.** Several brands, markets or franchises under one roof. You keep the multi-store machinery (one console, one identity for staff, a database per pod, custom domains per store) and simply do not sell plans to anyone else.
 
-Run distinct e-commerce operations (e.g., different brands, departments, franchises) efficiently and securely under one umbrella:
+Both run the same software; the difference is who the organizations are.
 
-*   **Centralize Management:** Operate numerous storefronts from a single deployment.
-*   **Self-Host for Control:** Deploy on your own AWS infrastructure for complete control over data and operations.
-*   **Ensure Strong Isolation:** Utilize **Dedicated Store Pods** (separate services/DB per store) or **Shared Store Pods** (separate DB per pod) for security and performance boundaries.
-*   **Maintain Brand Identity:** Easily map custom domains to individual storefronts.
+## Three kinds of user
 
-### 2. Build an E-commerce SaaS Platform
+| User | Signs in through | Where |
+|---|---|---|
+| Platform administrator | `uaa`, the staff identity server | The platform section of the console and uaa's own admin console: organizations, pods, plans, platform billing, users |
+| Merchant (organization admin, store admin, store moderator) | `uaa` | The seller console: catalog, content, storefront builder, orders, payments, domains, subscription, team |
+| Shopper | `cua`, the shopper identity server, one realm per store | The storefront on the store's domain: browse, search, cart, checkout, account |
 
-Launch your own Software-as-a-Service business offering e-commerce stores to the public:
+The [merchant](/guides/merchant), [shopper](/guides/shopper) and [platform admin](/guides/platform-admin) journeys walk through each.
 
-*   **Accelerate Development:** Use `cvhome` as the core multi-tenant engine for your SaaS.
-*   **Offer Tiered Plans:** Leverage **Shared Pods** for cost-effective plans and **Dedicated Pods** for premium clients.
-*   **Scale Horizontally:** Add more **Store Pods** as your customer base grows.
-*   **Enable Customization & Billing:** Integrate billing (e.g., Stripe) and allow customers to use their own domains. As it's open-source, fully customize the platform for your unique offering.
+## The shape
 
-## Key Advantages Summarized
+cvhome has two layers. The **platform layer** (`store-core`) runs once: staff identity (`uaa`), the platform gateway that owns the console's session, tenancy (organizations and stores), billing, the pod registry and the Angular seller console. The **business layer** (`store-pod`) runs once per **pod**: a Caddy edge that terminates TLS for custom domains, the merchant, content, catalog, inventory, checkout and payment services, the shopper identity server (`cua`) and the Next.js storefront, all sharing one database. Every **store** is a tenant inside a pod; the platform layer records which pod hosts which store, and that one fact decides where a store's data lives, which region serves its shoppers and which gateway route reaches it. Pods can be shared by many organizations or dedicated to one, and an external pod can live in another region or another account. The concepts are defined on [Core concepts](/guide/core-concepts) and the mechanics on [Tenancy and provisioning](/architecture/tenancy-provisioning).
 
-*   **True Multi-Tenancy:** Flexible models (Shared/Dedicated Pods).
-*   **Open Source:** Full transparency, no vendor lock-in.
-*   **Self-Hosted:** Complete control over data, infrastructure, and security (on AWS).
-*   **Scalable Architecture:** Designed to grow by adding more Store Pods.
-*   **Strong Isolation:** Separate databases per pod enhance security and stability.
+## The stack
 
-## Ready to Dive Deeper?
+| Layer | Technology |
+|---|---|
+| Services | Java 25, Spring Boot 4.0, Spring Cloud, Spring Data JPA / Hibernate 7.2 and Spring Data JDBC, Spring Authorization Server (two instances: staff and shoppers) |
+| Seller console | Angular 20 with server-side rendering |
+| Storefront | Next.js 16 / React 19, one application with pluggable theme packages |
+| Edge | Caddy with on-demand TLS, a domain-lookup middleware and S3 certificate storage (the pod edge); Spring Cloud Gateway (the platform edge) |
+| Data | PostgreSQL, one schema per service, one database per layer and per pod; S3 or MinIO for media |
+| Payments | Stripe, for platform subscriptions and as a store payment provider |
+| Build | One Gradle build for the Java services and the npm frontends; buildpack images |
+| Runtime | AWS ECS Fargate, Cloud Map, ALB and NLB, RDS, CloudFront, provisioned by Terraform from a one-click CloudFormation bootstrap; locally, `lcl` runs the same services on one machine |
 
-*   Understand the foundational design: **Core Concepts**
-*   Explore the components: **Architecture Overview**
-*   Deploy the platform: **AWS Deployment Guide**
-*   Run it locally: **Local Setup Guide**
+## How to read this site
+
+- **Architecture** — the system in context, the containers, the two layers, gateway routing, the edge and custom domains, authentication, tenancy and provisioning, and how the whole thing is deployed on AWS and locally. Start with [System context](/architecture/system-context).
+- **Guides** — what each kind of user does: merchant, shopper, platform administrator.
+- **Development** — running the stack on your machine with [lcl](/development/local-development), the [configuration reference](/development/configuration), and how to [contribute](/development/contributing).
+- **Operations** — deploying to AWS, the pipeline and promotion, hibernating and destroying an environment, monitoring, and releases.
+
+---
+
+*Source of truth: cvhome `README.md`, `AGENTS.md`, `gradle/libs.versions.toml`, `.claude/skills/project-structure/SKILL.md`, `references/multi-tenancy.md`, `references/authentication.md`; cvhome-platform `README.md`; orchestrator `repos.yaml`.*
