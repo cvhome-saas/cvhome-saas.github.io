@@ -158,6 +158,18 @@ links and repo table (after this merges). assets: retire `fast-run` (independent
   `ReactiveExternalPodService.listPods()`; the reference that said tenancy was corrected in cvhome in the
   same change.
 
+## Follow-ups, deliberately not done
+
+- **A catalog check for this repo.** The services-and-ports table on `/development/configuration` and the
+  service lists on the architecture pages are copies of `common-config.yml` in cvhome. Nothing notices when
+  that file moves and these do not. A small script here could fetch it and diff the table, the way
+  `cvhome-platform/scripts/check-catalog-drift.py` already does for `services.yaml`, and run in the same
+  pull-request job as the build. That is what would stop this site going stale the way the last one did; the
+  "Source of truth" footers only help somebody who already suspects a page is wrong.
+- **Four screenshots the local stack could not produce**: the pods and platform screens and the identity
+  admin screens need a platform-administrator session, and the billing page needs a store with a
+  subscription, which the seeded stores do not have. Worth revisiting when either is easy.
+
 ## Verification
 
 - `scripts/verify.sh` green at every phase: whitespace, `npm ci`, `npm run docs:build`, `scripts/check-images.sh`.
