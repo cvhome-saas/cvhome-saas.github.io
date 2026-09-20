@@ -8,15 +8,16 @@ set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
 
 # Referenced paths: markdown images/links, HTML <img src>, config.mts strings — anything that names /images/…
-referenced=$(grep -rhoE '/images/[A-Za-z0-9_./-]+\.(png|jpg|jpeg|svg|gif|webp|ico)' docs --include='*.md' --include='*.mts' --include='*.ts' --include='*.vue' \
-  --exclude-dir=dist --exclude-dir=cache --exclude-dir=node_modules | sort -u)
+# A planned screenshot is an HTML comment `<!-- img: /images/x.png - what it shows -->`. Those lines are
+# stripped first, so a slot waiting to be captured is not counted as a reference to a file that must exist.
+referenced=$(grep -rh --include='*.md' --include='*.mts' --include='*.ts' --include='*.vue' \
+  --exclude-dir=dist --exclude-dir=cache --exclude-dir=node_modules '' docs \
+  | grep -v '<!-- *img:' \
+  | grep -oE '/images/[A-Za-z0-9_./-]+\.(png|jpg|jpeg|svg|gif|webp|ico)' | sort -u)
 present=$(cd docs && find images -type f ! -name '.DS_Store' | sed 's#^#/#' | sort -u)
 
 missing=$(comm -23 <(printf '%s\n' "$referenced") <(printf '%s\n' "$present") || true)
 orphans=$(comm -13 <(printf '%s\n' "$referenced") <(printf '%s\n' "$present") || true)
-
-# Planned screenshots are HTML comments of the form `<!-- img: /images/x.png — what it shows -->` until they
-# are captured; they are deliberately not counted as references, so a comment never hides a missing file.
 
 status=0
 if [ -n "$missing" ]; then
