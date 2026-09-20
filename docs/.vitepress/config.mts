@@ -7,10 +7,13 @@ export default withMermaid({
   title: 'cvhome',
   description: 'Open-source multi-tenant e-commerce platform on AWS',
   lastUpdated: true,
-  head: [['link', { rel: 'icon', type: 'image/png', href: '/images/logo/logo.png' }]],
+  // Files under docs/public are copied to the site root untouched. Anything named from config or from a head
+  // tag has to live there: VitePress only rewrites image paths it finds in markdown, and a raw path it does
+  // not rewrite is served as written. The dev server hides this, because Vite serves docs/ as the root.
+  head: [['link', { rel: 'icon', type: 'image/png', href: '/logo.png' }]],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    logo: '/images/logo/logo.png',
+    logo: '/logo.png',
     search: { provider: 'local' },
     outline: [2, 3],
 

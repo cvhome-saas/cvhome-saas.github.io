@@ -7,7 +7,7 @@ hero:
   text: "Open-source multi-tenant e-commerce platform"
   tagline: Run many stores for many merchants, in your own AWS account.
   image:
-    src: /images/logo/logo.png
+    src: /logo.png
     alt: cvhome logo
   actions:
     - theme: brand
