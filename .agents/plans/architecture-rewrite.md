@@ -35,9 +35,14 @@ cvhome-platform `README.md`, `services.yaml`, `flavours.yaml`, `modules/*`, `boo
   keeps inbound links alive. Pages that were never reachable are deleted.
 - **A "Source of truth" footer on every page** names the file the page was written from, so the next
   rewrite knows what to diff against.
-- **Screenshots last.** Every prose phase leaves `<!-- img: /images/<dir>/<name>.png — what it shows -->`
-  where a screenshot belongs, so `docs:build` and `scripts/check-images.sh` stay green until the capture
-  phases replace them. Terminal output (`lcl status`, `lcl urls`) is a fenced code block, never a PNG.
+- **Screenshots last, and everything AWS last of all.** Every prose phase leaves
+  `<!-- img: /images/<dir>/<name>.png — what it shows -->` where a screenshot belongs, so `docs:build` and
+  `scripts/check-images.sh` stay green until a capture phase replaces it. Terminal output (`lcl status`,
+  `lcl urls`) is a fenced code block, never a PNG.
+- **One AWS phase, at the end, done in one sitting.** Anything that needs a signed-in AWS console is phase
+  12 and nothing else: the captures, the legacy images, and the check of the five AWS pages against the
+  live environment. Splitting it would mean opening the console several times and proving the same facts
+  twice, and every earlier phase can be written, verified and reviewed without an account.
 - **The image check is a gate** because VitePress does not fail on a missing image, and unreferenced
   screenshots are dead weight in every clone.
 
@@ -83,8 +88,49 @@ ports, config slices, images and tags, flavours and tfvars).
 ## Phase 10 — product screenshots from lcl (commit 10)
 `docs/images/lcl/*.png` from a running `lcl start -d` stack: console, uaa admin, storefront.
 
-## Phase 11 — AWS console screenshots (commit 11)
-`docs/images/aws/*.png` from the dev environment; the legacy shots re-checked or deleted.
+## Phase 11 — the plan as built (commit 11)
+Deviations and verification filled in.
+
+## Phase 12 — everything AWS (its own pull request)
+
+The only phase that needs an AWS account. It is done in one sitting on the existing **dev** environment,
+after a person has signed in to the console in the browser; nothing here is a fresh bootstrap. Region
+`eu-central-1`, except the CloudFront certificate, which lives in `us-east-1`.
+
+**a. Capture the thirteen screenshots.** The slots are already in the pages as
+`<!-- img: /images/aws/<name>.png — … -->`; each one is replaced in place.
+
+| File | Page and step |
+|---|---|
+| `cfn-stack-outputs` | the bootstrap stack's Outputs tab after `CREATE_COMPLETE` |
+| `codebuild-projects` | the seven CodeBuild projects of one environment |
+| `codebuild-3-apply-log` | the tail of a succeeded `3-apply` log, with the `console_url` line |
+| `ecs-clusters`, `ecs-core-services`, `ecs-pod-services` | the cluster list, the core services, one pod's services |
+| `rds-instances` | the core instance and the per-pod instances |
+| `route53-records` | the hosted zone's alias records for the platform hosts, a pod and the CDN |
+| `acm-certificate` | the regional certificate for the environment domain and its wildcard |
+| `cloudfront-distribution` | one pod's distribution and its alias |
+| `secrets-list`, `ssm-parameters` | **names only**; never open a secret's value |
+| `cloudwatch-dashboard` | the environment dashboard, used on two pages |
+
+**b. Settle the six legacy images.** `docs/images/aws/legacy-*.png` were captured on the 1.x bootstrap and
+carry captions saying so. Each one is either replaced by its new capture and deleted, or kept with a caption
+that says exactly which part is still true. The parameters shot and the outputs shot are known stale: the
+form no longer has `PodSize`, `isProd`, `isMonitoring` or `allowTestStores`, and the apply stage now ends
+with `console_url`.
+
+**c. Check the five AWS pages against the live environment.** `/architecture/deployment-aws`,
+`/operations/deployment-guide`, `/operations/pipeline`, `/operations/lifecycle` and `/operations/monitoring`
+were written from the Terraform modules and the bootstrap template. With the console open, confirm the
+resource names, the CloudFormation parameter list, the stack outputs, the CodeBuild project names, the log
+group naming and the dashboard's sections, and correct whatever the code implied but the account does not
+show.
+
+**d. QA.** Add the cases these pages earn to `qa/site-qa.md` and tag them honestly.
+
+**Hygiene, the same as phase 10.** 1440x900 window, light theme, `sips -Z 1600`, PNG, 300 KB per image and
+10 MB for the phase. Crop or blur the account identifier before `git add`, and look at every file before
+committing it. Never capture a secret's value tab.
 
 ## Other repos
 cvhome: fix six stale reference statements, resync the `.agents` mirror (lands first). dot-github: profile
@@ -102,10 +148,11 @@ links and repo table (after this merges). assets: retire `fast-run` (independent
   the cart and checkout captures came out smaller than the rest. The slots were removed rather than left as
   comments or filled with something misleading. The identity server's sign-in page was captured instead and
   sits on the platform-admin page.
-- **Phase 11 is not in this pull request.** The AWS console screenshots need a signed-in session on the dev
-  environment, which the person has to start. The six screenshots from the previous guide stay on the
-  deployment guide with captions saying which parts are stale, and the slots for the new ones are gone; a
-  follow-up pull request adds them.
+- **Phase 12 is deliberately not in this pull request.** Everything that needs an AWS account was pulled out
+  of the phase list and grouped into one final phase, to be done in one sitting once a person has signed in
+  to the console. The thirteen slots stay in the pages as comments, the six legacy images stay with captions
+  saying which parts are stale, and the AWS pages stand on what the Terraform and the bootstrap template say
+  until the console confirms them.
 - **12 themes, not 13.** The storefront theme registry lists twelve; the brief said thirteen.
 - **The pod list comes from pod-registry, not tenancy.** The gateway's `PodClient` calls
   `ReactiveExternalPodService.listPods()`; the reference that said tenancy was corrected in cvhome in the
