@@ -111,6 +111,102 @@ What the edges mean:
 
 Ports, hostnames and the fronting gateway (`gateway-service-name`) are recorded per service in `common-config.yml`. A service is reachable on its own port only inside its namespace (`store-core.cvhome.lcl`, `store-pod-<id>.cvhome.lcl`); from anywhere else it is a path on its gateway, with the prefix stripped (except `/cua` and `/uaa`).
 
+## Service to service
+
+Diagram C2 draws how a request reaches a service. It does not draw what the services then ask each other,
+and that is a different graph: a request for a cart page fans out to four services before it answers.
+
+Every edge below is one module depending on another domain's `-external-api`, which is the only sanctioned
+way a service may call a peer. The interface lives with the provider, the provider's `External*Api`
+controller implements it, and the caller consumes it through `RestClientBuilder`. Nothing calls another
+service's `-core` or `-service` module, so this table is the complete set: a new edge cannot appear without
+a new dependency in a `build.gradle`.
+
+### Inside a pod
+
+```mermaid
+flowchart LR
+  subgraph pod["store-pod, one per pod"]
+    checkout["checkout<br/>[:8123]"]
+    catalog["catalog<br/>[:8122]"]
+    inventory["inventory<br/>[:8126]"]
+    payment["payment<br/>[:8125]"]
+    content["content<br/>[:8121]"]
+    cua["cua<br/>[:8124]"]
+    merchant["merchant<br/>[:8120]"]
+  end
+  billing["billing<br/>[store-core · :8021]"]
+  checkout -->|"cart lines"| catalog
+  checkout -->|"reserve, commit, release"| inventory
+  checkout -->|"initiate, status"| payment
+  catalog -->|"media by id"| content
+  catalog -->|"entitlements"| billing
+  inventory -.->|"reservation expired"| checkout
+  payment -.->|"payment outcome"| checkout
+  checkout -->|"store config"| merchant
+  catalog --> merchant
+  content --> merchant
+  cua -->|"which store owns the shopper"| merchant
+  inventory --> merchant
+  payment --> merchant
+  class checkout,catalog,inventory,payment,content,cua,merchant container
+  class billing external
+  classDef person fill:none,stroke:#6b7280,stroke-width:2px
+  classDef container fill:none,stroke:#3b82f6,stroke-width:2px
+  classDef db fill:none,stroke:#3b82f6,stroke-width:2px,stroke-dasharray:4 2
+  classDef external fill:none,stroke:#6b7280,stroke-width:1.5px,stroke-dasharray:6 3
+  classDef edge fill:none,stroke:#10b981,stroke-width:2px
+```
+
+Solid is a call the caller waits for; dashed is a signal delivered after the fact, from an outbox or a
+scheduled job. Shapes follow the [legend](/architecture/system-context#legend).
+
+Two things the picture says that the prose should not bury.
+
+**`merchant` is the hub of a pod.** Six of the nine services call it, all for the same thing: the store's
+configuration, through `ExternalMerchantStoreService.getStore`. It is also what `spg` asks on every cold
+request, to turn a host name into a store and to decide whether to issue a certificate
+([edge and custom domains](/architecture/edge-spg)). Nothing else in a pod is depended on so widely, so
+`merchant` being slow is the pod being slow, and `merchant` being down is the pod being down.
+
+**`checkout` is called back, not just calling.** Placing an order reserves stock and starts a payment, and
+both of those finish later, so `inventory` and `payment` call `ExternalOrderSignalService` on `checkout`
+when they do. The order is the thing that survives; the signals move it along. That is why the order path
+reads as durable rather than as one long transaction ([store-pod](/architecture/store-pod)).
+
+### Across the layers
+
+A pod reaching into `store-core` happens in exactly one place. `catalog` asks `billing` for a store's
+entitlements before a product write, which is why `lcl-config.yml` carries a namespace-qualified alias for
+the platform gateway. Everything else crossing the boundary goes the other way, from `store-core` into a
+pod.
+
+| Caller | Callee | Contract | What it is for |
+|---|---|---|---|
+| `store-core-gateway` | `pod-registry` | `ExternalPodService.listPods` | The pod list that becomes the `/spg/**` routes, refreshed every minute ([gateway routing](/architecture/gateway-routing)) |
+| `store-core-gateway` | `billing` | `ExternalEntitlementService.snapshot` | `StoreBillingGuardFilter` answers 402 on a seller write when the store is not entitled |
+| `tenancy` | `billing` | `ExternalStoreQuotaService.checkStoreCreate`, `provision` | May this organization create another store, and the new store's subscription. A refusal is a 422 |
+| `tenancy` | `pod-registry` | `ExternalPodPlacementService.place` | Which pod a new store is placed in |
+| `tenancy` | `merchant` in the target pod | `MerchantStorePodClient.create` | Creates the store inside the chosen pod, driven by the outbox ([tenancy and provisioning](/architecture/tenancy-provisioning)) |
+| `catalog` | `billing` | `ExternalEntitlementService.snapshot` | The store's entitlements before a product write. The only pod-to-core call |
+
+### The calls inside a pod
+
+| Caller | Callee | Contract | What it is for |
+|---|---|---|---|
+| `checkout` | `catalog` | `ExternalProductService` (`/cart-lines`, `/detailed-product`) | Product data for the lines in a cart |
+| `checkout` | `inventory` | `ExternalProductReservationService` (`reserve`, `commit`, `release`) | The stock reservation lifecycle behind an order |
+| `checkout` | `payment` | `ExternalPaymentGatewayService` (`initiatePayment`, `status`) | Starts a payment and reads its outcome |
+| `catalog` | `content` | `ExternalMediaService.resolve` | Media assets by id, and their usage |
+| `inventory` | `checkout` | `ExternalOrderSignalService.signalReservationExpired` | A reservation expired; the expiry job tells the order |
+| `payment` | `checkout` | `ExternalOrderSignalService.signalPayment` | The payment outcome reaches the order, delivered from payment's outbox |
+| `cua` | `merchant` | `ExternalMerchantStoreService.getStore` | Which store owns the shopper signing in |
+| `catalog`, `checkout`, `content`, `inventory`, `payment` | `merchant` | `ExternalMerchantStoreService.getStore` | The store's configuration: languages, currency, domains |
+
+Every one of these carries a `client_credentials` token minted by `uaa` for the calling service, and every
+one names its failure contract when the client is built, so a peer being unavailable is a typed exception
+rather than a stack trace ([authentication](/architecture/authentication)).
+
 ## Data
 
 Each Spring Boot service owns one Postgres schema, named after the application (`pod_registry`, `content`, `payment`, ...), and ships its own DDL as a `schema.sql`. Foreign keys never cross a schema. `store-core` shares one Postgres; each pod has its own. `content`, `merchant` and `payment` configure an S3 client for files (MinIO locally; S3 behind CloudFront on AWS), and `spg` keeps its certificates in an S3 bucket.

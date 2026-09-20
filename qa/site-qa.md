@@ -44,6 +44,18 @@ visible; mermaid reports syntax errors there, not in the build.
 - Steps: search "pod-registry", "lcl start", "hibernate".
 - Expect: each returns the owning page in the top results.
 
+## 04c — The service-to-service graph
+### 04c.1 The call graph matches the code [verified]
+- Setup: a cvhome checkout.
+- Steps: list every module that depends on another domain's `-external-api`
+  (`grep -oE "project\('?:store-(pod|core):[a-z-]+:[a-z-]+-external-api" $(find store-pod store-core -name build.gradle)`),
+  and compare it with the tables and the diagram on `/architecture/containers#service-to-service`.
+- Expect: every dependency appears as an edge or a table row, and nothing is drawn that the code does not do.
+- Result (2026-09-20): matched, once the search covered `-core` modules and not only `-service` ones. Two
+  edges live only in `-core` (`inventory-core` and `payment-core` both depend on `checkout-external-api`
+  for the order signals), so a search of service modules alone misses them and would wrongly read the
+  diagram's two dashed edges as invented.
+
 ## 05 — CI
 ### 05.1 A pull request builds the site without deploying [not verified]
 - Steps: open a PR; look at the Actions run.
