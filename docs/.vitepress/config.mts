@@ -83,6 +83,10 @@ export default withMermaid({
   },
   mermaid: {
     // Diagrams use stroke-only classDefs so the theme's own foreground and background carry both modes.
+    // wrappingWidth is mermaid's 200px default, which re-wraps a label like
+    // "[Spring Cloud Gateway · :8000]" onto a third line after the box has already been sized for two,
+    // and the port is then clipped at the bottom edge. Widen it so a second line stays a second line.
+    flowchart: { wrappingWidth: 340, useMaxWidth: true },
   },
   mermaidPlugin: {
     class: 'mermaid',

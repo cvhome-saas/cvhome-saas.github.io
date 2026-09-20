@@ -162,7 +162,10 @@ links and repo table (after this merges). assets: retire `fast-run` (independent
 
 - `scripts/verify.sh` green at every phase: whitespace, `npm ci`, `npm run docs:build`, `scripts/check-images.sh`.
 - The build renders 30 pages with no dead link. 16 images, all referenced, none orphaned.
-- `qa/site-qa.md` cases are written but still `[not verified]`: they need a pass through
-  `npm run docs:dev` in a browser, which is the reviewer's step before merge.
+- `qa/site-qa.md`: seven of eight cases run and `[verified]` against the dev server in a browser on
+  2026-09-20. The eighth needs the pull request merged. The pass found one defect, REG-1: mermaid re-wrapped
+  any label line longer than its 200px default after sizing the box, so ports were clipped off the bottom of
+  `store-core-gateway`, `uaa`, the object store and the Postgres cylinders, in both themes. Fixed by setting
+  `flowchart.wrappingWidth` to 340.
 - The screenshots were taken against a stack started with `lcl start -d` on this repository's sibling
   checkout, all nineteen services up, on the seeded test stores.
