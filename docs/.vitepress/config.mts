@@ -1,72 +1,90 @@
-import { defineConfig } from 'vitepress'
-import { withMermaid } from "vitepress-plugin-mermaid";
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
 // https://vitepress.dev/reference/site-config
+// The sidebar is the site's table of contents. Every page ends with a "Source of truth" line naming the
+// file in the owning repo it was written from; rewrite the page when that file moves.
 export default withMermaid({
-  title: "cvhome",
-  description: "Open Source Multi-Tenant E-commerce Platform",
+  title: 'cvhome',
+  description: 'Open-source multi-tenant e-commerce platform on AWS',
+  lastUpdated: true,
+  head: [['link', { rel: 'icon', type: 'image/png', href: '/images/logo/logo.png' }]],
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    nav: [ // Top navigation bar
+    logo: '/images/logo/logo.png',
+    search: { provider: 'local' },
+    outline: [2, 3],
+
+    nav: [
       { text: 'Home', link: '/' },
-      { text: 'Guide', link: '/guide/introduction' }, // Point to Introduction as the start
-      { text: 'GitHub', link: 'https://github.com/orgs/cvhome-saas' }
+      { text: 'Architecture', link: '/architecture/system-context' },
+      { text: 'Guides', link: '/guides/merchant' },
+      { text: 'Development', link: '/development/local-development' },
+      { text: 'Operations', link: '/operations/deployment-guide' },
+      { text: 'GitHub', link: 'https://github.com/cvhome-saas' },
     ],
 
     sidebar: [
       {
-        text: 'Guide', // General Introduction and Concepts
+        text: 'Guide',
         items: [
-          { text: 'Introduction', link: '/guide/introduction' }, // Why cvhome?
-          { text: 'Core Concepts', link: '/guide/core-concepts' }, // Essential ideas
-          { text: 'Architecture Overview', link: '/guide/architecture-overview' } // Moved here
-        ]
+          { text: 'Introduction', link: '/guide/introduction' },
+          { text: 'Core concepts', link: '/guide/core-concepts' },
+          { text: 'Repositories', link: '/guide/repositories' },
+        ],
       },
       {
-        text: 'Development', // Renamed - Focus on local dev & contribution
+        text: 'Architecture',
         items: [
-          { text: 'Local Setup', link: '/development/local-setup' }, // How to run locally
-          { text: 'Contributing', link: '/development/contributing' } // How to contribute code
-          // { text: 'Backend Details', link: '/development/backend' }, // Optional deeper dive
-          // { text: 'Frontend Details', link: '/development/frontend' }, // Optional deeper dive
-        ]
+          { text: 'System context', link: '/architecture/system-context' },
+          { text: 'Containers', link: '/architecture/containers' },
+          { text: 'store-core', link: '/architecture/store-core' },
+          { text: 'store-pod', link: '/architecture/store-pod' },
+          { text: 'Gateway routing', link: '/architecture/gateway-routing' },
+          { text: 'Edge and custom domains', link: '/architecture/edge-spg' },
+          { text: 'Authentication', link: '/architecture/authentication' },
+          { text: 'Tenancy and provisioning', link: '/architecture/tenancy-provisioning' },
+          { text: 'Deployment: AWS', link: '/architecture/deployment-aws' },
+          { text: 'Deployment: local', link: '/architecture/deployment-local' },
+        ],
       },
       {
-        text: 'Deployment', // Renamed - Focus on deploying to AWS
+        text: 'Guides',
         items: [
-          // { text: 'Deployment Overview', link: '/deployment/overview' }, // Removed - Assumed file deleted/empty
-          { text: 'AWS Deployment Guide', link: '/deployment/aws-deployment-guide' }, // Renamed and corrected link
-          { text: 'AWS Architecture', link: '/deployment/aws-architecture' },
-          { text: 'Cleanup Guide', link: '/deployment/cleanup-guide' }, // Corrected text
-          // { text: 'Monitoring & Logging', link: '/deployment/monitoring' }, // Optional
-          // { text: 'Upgrading', link: '/deployment/upgrading' } // Optional
-        ]
+          { text: 'Merchant journey', link: '/guides/merchant' },
+          { text: 'Shopper journey', link: '/guides/shopper' },
+          { text: 'Platform admin', link: '/guides/platform-admin' },
+        ],
       },
-      // { // Commented out until content is ready
-      //   text: 'Customization',
-      //   items: [
-      //     { text: 'Theming', link: '/customization/theming' }, // How to change look and feel
-      //     // { text: 'Plugin System', link: '/customization/plugins' }, // If applicable
-      //     // { text: 'API Usage', link: '/customization/api-usage' } // How to interact programmatically
-      //   ]
-      // }
-      // Optional: Add API Reference section if needed
-      // {
-      //   text: 'API Reference',
-      //   items: [
-      //     { text: 'REST API', link: '/api/rest-api' }
-      //   ]
-      // }
+      {
+        text: 'Development',
+        items: [
+          { text: 'Local development', link: '/development/local-development' },
+          { text: 'Configuration reference', link: '/development/configuration' },
+          { text: 'Contributing', link: '/development/contributing' },
+        ],
+      },
+      {
+        text: 'Operations',
+        items: [
+          { text: 'Deploy to AWS', link: '/operations/deployment-guide' },
+          { text: 'Pipeline and promotion', link: '/operations/pipeline' },
+          { text: 'Hibernate, wake, destroy', link: '/operations/lifecycle' },
+          { text: 'Monitoring and logs', link: '/operations/monitoring' },
+          { text: 'Releases', link: '/operations/releases' },
+        ],
+      },
     ],
 
-    socialLinks: [
-      { icon: 'github', link: 'https://github.com/orgs/cvhome-saas' }
-    ]
+    socialLinks: [{ icon: 'github', link: 'https://github.com/cvhome-saas' }],
+    editLink: {
+      pattern: 'https://github.com/cvhome-saas/cvhome-saas.github.io/edit/main/docs/:path',
+      text: 'Edit this page on GitHub',
+    },
   },
   mermaid: {
-    // Mermaid options if needed
+    // Diagrams use stroke-only classDefs so the theme's own foreground and background carry both modes.
   },
   mermaidPlugin: {
-    // Mermaid plugin options if needed
+    class: 'mermaid',
   },
 })
