@@ -7,6 +7,7 @@ export default withMermaid({
   description: "Open Source Multi-Tenant E-commerce Platform",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
+    logo: '/images/logo/logo.png',
     nav: [ // Top navigation bar
       { text: 'Home', link: '/' },
       { text: 'Guide', link: '/guide/introduction' }, // Point to Introduction as the start
