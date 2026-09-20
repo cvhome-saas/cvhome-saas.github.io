@@ -92,8 +92,30 @@ links and repo table (after this merges). assets: retire `fast-run` (independent
 `known-drift.md` / `repo-map.md` for this repo and assets after merge.
 
 ## Deviations, as built
-_Filled in while implementing._
+
+- **An extra commit between phases 9 and 10.** `scripts/check-images.sh` counted the planned-screenshot
+  comments as real references, which is the opposite of what its own comment promised, so a page that named
+  its future screenshot failed the gate. Fixed in its own commit rather than folded into a content phase.
+- **Four screenshot slots dropped instead of filled.** The pods and platform screens and the uaa admin
+  screens need a platform-administrator session that would not complete in this environment; the seeded
+  stores carry no subscription, so the billing page is an empty state that would teach a reader nothing; and
+  the cart and checkout captures came out smaller than the rest. The slots were removed rather than left as
+  comments or filled with something misleading. The identity server's sign-in page was captured instead and
+  sits on the platform-admin page.
+- **Phase 11 is not in this pull request.** The AWS console screenshots need a signed-in session on the dev
+  environment, which the person has to start. The six screenshots from the previous guide stay on the
+  deployment guide with captions saying which parts are stale, and the slots for the new ones are gone; a
+  follow-up pull request adds them.
+- **12 themes, not 13.** The storefront theme registry lists twelve; the brief said thirteen.
+- **The pod list comes from pod-registry, not tenancy.** The gateway's `PodClient` calls
+  `ReactiveExternalPodService.listPods()`; the reference that said tenancy was corrected in cvhome in the
+  same change.
 
 ## Verification
-`scripts/verify.sh` per phase. `qa/site-qa.md` cases, run in `npm run docs:dev` via a browser before the
-PR is opened; the deployed-site case after merge.
+
+- `scripts/verify.sh` green at every phase: whitespace, `npm ci`, `npm run docs:build`, `scripts/check-images.sh`.
+- The build renders 30 pages with no dead link. 16 images, all referenced, none orphaned.
+- `qa/site-qa.md` cases are written but still `[not verified]`: they need a pass through
+  `npm run docs:dev` in a browser, which is the reviewer's step before merge.
+- The screenshots were taken against a stack started with `lcl start -d` on this repository's sibling
+  checkout, all nineteen services up, on the seeded test stores.
