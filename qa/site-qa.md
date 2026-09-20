@@ -56,5 +56,16 @@ visible; mermaid reports syntax errors there, not in the build.
 ## REG — regression watchlist
 - A mermaid syntax error does not fail the build; it breaks one diagram silently (case 02.1 is the only catch).
 
+### REG-3 A path named outside markdown is served verbatim, and only production shows it
+Found by case 05.2 on 2026-09-20, after the first deploy. VitePress rewrites image paths it finds in markdown
+and emits the files into `assets/` with a hash, but a path named anywhere else, such as `themeConfig.logo` or
+a `head` favicon tag, is written into the page exactly as given. Such a file has to live under `docs/public`,
+which is copied to the site root untouched. The logo sat in `docs/images/logo/`, so the dev server served it
+(Vite serves `docs/` as the root) and the deployed site 404'd on it, with every check green.
+
+Fixed by moving it to `docs/public/logo.png` and referencing `/logo.png`. `scripts/check-images.sh` now has a
+second rule for paths named outside markdown and fails when one is not under `docs/public`; reverting the move
+makes it fail, which is how the rule was checked.
+
 ## 99 — known gaps
 - None recorded yet.
