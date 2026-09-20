@@ -51,9 +51,45 @@ lcl logs uaa -f       # one service's log, followed
 lcl why catalog       # exit code, health reason, who holds the port, the exact command and env
 ```
 
-<!-- term: lcl status -->
+```
+$ lcl status
+stack      default  ~/cvhome
+supervisor running 22756 (running)
+ports      offset +0  compose project lcl-cvhome-default-ddfc667c  containers: minio postgres spg
 
-<!-- term: lcl urls -->
+service                     state  port       pid    uptime  errors  health
+--------------------------  -----  ---------  -----  ------  ------  -----------
+uaa                         up     http:8001  26598  3m27s   1       UP
+store-core-gateway          up     http:8000  27144  2m50s   13      UP
+tenancy                     up     http:8020  27329  2m40s   0       UP
+billing                     up     http:8021  27759  2m28s   6       UP
+pod-registry                up     http:8022  28728  2m18s   0       UP
+merchant                    up     http:8120  29026  2m10s   2       UP
+content                     up     http:8121  29184  2m0s    5       UP
+catalog                     up     http:8122  29409  1m48s   0       UP
+checkout                    up     http:8123  29633  1m33s   0       UP
+cua                         up     http:8124  29756  1m21s   0       UP
+payment                     up     http:8125  29954  1m9s    5       UP
+inventory                   up     http:8126  30202  57s     4       UP
+console-ui                  up     http:8011  30544  47s     0       :8011 open
+landing-ui                  up     http:8110  31112  37s     0       :8110 open
+stripe-billing-webhook      up     -          31244  32s     0       ready (log)
+stripe-org1-store1-webhook  up     -          31297  28s     0       ready (log)
+stripe-org1-store2-webhook  up     -          31351  24s     0       ready (log)
+stripe-org2-store1-webhook  up     -          31390  22s     0       ready (log)
+stripe-org2-store2-webhook  up     -          31429  20s     0       ready (log)
+
+logs: .lcl/default/logs   ·   lcl why <service> for details
+```
+
+```
+$ lcl urls
+seller console  http://gateway.com:8000
+uaa             http://uaa.gateway.com:8001
+storefront      http://org1-store1.spg-507f1f77.gateway.com:80
+minio console   http://localhost:9001
+postgres        postgresql://localhost:5432/cvhome
+```
 
 ## Entry points
 
@@ -65,7 +101,7 @@ lcl why catalog       # exit code, health reason, who holds the port, the exact 
 | MinIO console | `http://localhost:9001` | Local object storage for product images and media. |
 | Postgres | `localhost:5432`, database `cvhome` | One database, one schema per service. |
 
-<!-- img: /images/lcl/console-login.png — the sign-in page at gateway.com:8000 -->
+![The sign-in page at gateway.com:8000](/images/lcl/console-login.png)
 
 ## Test stores and logins
 
@@ -110,7 +146,37 @@ lcl stop --stack feature-x
 lcl doctor
 ```
 
-<!-- term: lcl doctor -->
+```
+$ lcl doctor
+  ✓ docker is running
+  ✓ lsof on PATH
+  ✓ /etc/hosts has all 19 hostnames from lcl.yml
+  ✓ uaa: cwd exists
+  ✓ store-core-gateway: cwd exists
+  ✓ tenancy: cwd exists
+  ✓ billing: cwd exists
+  ✓ pod-registry: cwd exists
+  ✓ merchant: cwd exists
+  ✓ content: cwd exists
+  ✓ catalog: cwd exists
+  ✓ checkout: cwd exists
+  ✓ cua: cwd exists
+  ✓ payment: cwd exists
+  ✓ inventory: cwd exists
+  ✓ console-ui: cwd exists
+  ✓ landing-ui: cwd exists
+  ✓ stripe-billing-webhook: cwd exists
+  ✓ stripe-org1-store1-webhook: cwd exists
+  ✓ stripe-org1-store2-webhook: cwd exists
+  ✓ stripe-org2-store1-webhook: cwd exists
+  ✓ stripe-org2-store2-webhook: cwd exists
+  ✓ ~/cvhome/lcl.yml: schema v1, 19 source service(s); 6 published ports in 3 Compose service(s) (docker-compose-lcl.yml)
+  ✓ hook after-up uaa
+  ✓ every service in lcl.yml is structurally runnable
+  ✓ all 28 ports at offset +0 are free
+
+all good
+```
 
 `lcl doctor` checks that Docker is running, that the tools it needs are on `PATH`, that `/etc/hosts` has every host name from `lcl.yml`, which stacks are registered, and whether the ports this stack would use are free.
 

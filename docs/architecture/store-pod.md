@@ -69,7 +69,7 @@ flowchart LR
 
 Not drawn: every pod service accepts JWTs from both `uaa` (staff, via the gateway's token relay) and `cua` (shoppers), and authenticates to its peers with a `client_credentials` client against `uaa`; `catalog` asks `billing` in `store-core` for a store's entitlements before a product write. See [Containers](/architecture/containers) and [Authentication](/architecture/authentication).
 
-<!-- img: /images/lcl/storefront-home.png — a demo store's home page on its own host, rendered by landing-ui through spg -->
+![A demo store's home page on its own host, rendered by landing-ui through spg](/images/lcl/storefront-home.png)
 
 ## spg: the pod edge (:80, :443)
 

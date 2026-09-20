@@ -51,7 +51,7 @@ flowchart TB
 
 The request path for a signed-in merchant: browser → `store-core-gateway` → `console-ui` for the shell, then `/tenancy/**`, `/billing/**`, `/pod-registry/**`, `/uaa/**` on the same origin for data, and `/spg/**?store=<id>&pod=<podId>` for anything that lives in the store's pod. The gateway runs the OAuth2 authorization-code flow against `uaa`, keeps the session, and relays the access token on every backend route. `console-ui` never holds a token. Details: [Authentication](/architecture/authentication), [Gateway routing](/architecture/gateway-routing).
 
-<!-- img: /images/lcl/console-dashboard.png — the console dashboard at gateway.com after signing in as a store admin -->
+![The console dashboard at gateway.com after signing in as a store admin](/images/lcl/console-dashboard.png)
 
 ## store-core-gateway (:8000)
 

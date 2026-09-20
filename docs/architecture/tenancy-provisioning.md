@@ -66,8 +66,6 @@ Pods moved out of tenancy in 2026-08 (`.agents/plans/tenancy-and-pod-registry-sp
 
 `PodApi` gates every method with `hasPermission(null,'PodId','STORE-CORE.POD.READ'|'STORE-CORE.POD.MANAGE')`. `MANAGE` (create, update, drain, resume, delete) is platform-operator only: a pod is infrastructure, not a self-service resource. `READ` is tenant-scoped: a super admin and a service principal see every pod, an org admin sees only its own private pods. `GET /api/v1/pod/list` is the unpaged form the gateway polls ([gateway routing](/architecture/gateway-routing)). Placement is `POST /api/v1/pod/private/placement` behind `STORE-CORE.POD.PLACEMENT`.
 
-<!-- img: /images/lcl/console-platform-pods.png — the platform admin's pods page -->
-
 ## Provisioning a store
 
 ```mermaid

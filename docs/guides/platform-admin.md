@@ -10,6 +10,8 @@ Organizations, pods, plans, billing and identity: the screens only a platform ad
 
 The account is created by the platform, not by a person. `uaa`'s seed writes a `super-admin` user with the password taken from `UAA_ADMIN_PASSWORD`, and the property has no default: a deployment that forgets it fails to start rather than running on a committed value. On AWS the bootstrap generates that password into the environment's Secrets Manager secret `/<project>/<env>/uaa` and binds it to the `uaa` task. On a local stack the `lcl` and `test-stores` profiles set it to `admin`; that is a test fixture that exists only there, and the account is `super-admin` / `admin` on `http://gateway.com:8000` and `http://uaa.gateway.com:8001`.
 
+![The uaa sign-in page at uaa.gateway.com:8001, the identity server's own door](/images/lcl/uaa-sign-in.png)
+
 ## Platform dashboard
 
 The platform dashboard counts what the platform runs: organizations, stores and subscriptions, with a link into platform billing. It is the entry point of the platform section in the console.
@@ -23,8 +25,6 @@ The organizations list is searchable and lets the administrator create an organi
 A pod is a physical deployment of the business layer: its own edge, services and database, hosting many stores. The pods screen is the fleet: a searchable list with an action to create a pod. Creating one is platform-operator work and asks for the pod's name, its domain and its endpoint. The endpoint has a type: `INTERNAL` means the pod sits in the same cluster and is reached through service discovery; `EXTERNAL` means it is reached over a URL, which may be another region, another account or another cloud. A pod is either shared (the default pool every organization's stores are placed in) or dedicated to one organization; that is one field on the pod, and an organization with a dedicated pod always lands on it while nobody else can reach it.
 
 The pod detail page shows the pod's state, its routing (endpoint and domain), its stores, and the editable fields. Two actions matter operationally: **drain**, which moves new placements elsewhere while the pod keeps its route and its existing stores, and **resume**. A health probe records each pod's status, and an unreachable pod goes red without losing its route. Drain and delete are super-admin only. The model behind this is on [Tenancy and provisioning](/architecture/tenancy-provisioning).
-
-<!-- img: /images/lcl/console-platform-pods.png — the pods screen, the fleet list with the shared pod -->
 
 ## Platform plans
 
@@ -54,8 +54,6 @@ The platform users screen lists every account known to `uaa` with their roles, f
 | Account | The signed-in administrator's own account; the one screen not behind the super-admin gate. |
 
 The whole console is translated and mirrors in Arabic. Someone who is not an administrator gets nothing from any of it. How `uaa` relates to `cua`, the shopper realm, is on [Authentication](/architecture/authentication).
-
-<!-- img: /images/lcl/uaa-admin-users.png — the users screen of the uaa admin console at uaa.gateway.com:8001 -->
 
 ---
 
